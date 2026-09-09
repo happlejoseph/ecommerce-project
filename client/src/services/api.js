@@ -1,9 +1,9 @@
 
 
-                                     import axios from "axios";
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3001/api",
+  baseURL: "https://ecommerce-project-3hyo.onrender.com",
 });
 
 // Attach auth token to every request if present
