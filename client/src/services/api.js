@@ -3,7 +3,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://ecommerce-project-3hyo.onrender.com",
+  baseURL: "https://ecommerce-project-3hyo.onrender.com/api",
 });
 
 // Attach auth token to every request if present
