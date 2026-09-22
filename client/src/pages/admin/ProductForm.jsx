@@ -12,6 +12,7 @@ const ProductForm = () => {
   const isEdit = Boolean(id);
 
   const [categories, setCategories] = useState([]);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -19,11 +20,11 @@ const ProductForm = () => {
     discount: "",
     stock: "",
     category: "",
-    movement: '',
-    caseMaterial: '',
-    strapMaterial: '',
-    waterResistance: '',
-    warranty: ''
+    movement: "",
+    caseMaterial: "",
+    strapMaterial: "",
+    waterResistance: "",
+    warranty: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -32,6 +33,7 @@ const ProductForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -45,6 +47,7 @@ const ProductForm = () => {
     fetchCategories();
   }, []);
 
+  // Fetch product when editing
   useEffect(() => {
     if (!isEdit) return;
 
@@ -54,12 +57,18 @@ const ProductForm = () => {
         const product = response.data.product;
 
         setFormData({
-          name: product.name,
-          description: product.description,
-          price: product.price,
+          name: product.name || "",
+          description: product.description || "",
+          price: product.price || "",
           discount: product.discount || "",
-          stock: product.stock,
+          stock: product.stock || "",
           category: product.category?._id || "",
+
+          movement: product.movement || "",
+          caseMaterial: product.caseMaterial || "",
+          strapMaterial: product.strapMaterial || "",
+          waterResistance: product.waterResistance || "",
+          warranty: product.warranty || "",
         });
 
         setImagePreview(product.image?.url || "");
@@ -73,6 +82,7 @@ const ProductForm = () => {
     fetchProduct();
   }, [id, isEdit]);
 
+  // Handle input changes
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -82,6 +92,7 @@ const ProductForm = () => {
     }));
   };
 
+  // Handle image selection
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
 
@@ -91,13 +102,16 @@ const ProductForm = () => {
     }
   };
 
+  // Submit product
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
     setSubmitting(true);
 
     try {
       const payload = new FormData();
+
       payload.append("name", formData.name);
       payload.append("description", formData.description);
       payload.append("price", formData.price);
@@ -105,24 +119,39 @@ const ProductForm = () => {
       payload.append("stock", formData.stock);
       payload.append("category", formData.category);
 
+      // Watch details
+      payload.append("movement", formData.movement);
+      payload.append("caseMaterial", formData.caseMaterial);
+      payload.append("strapMaterial", formData.strapMaterial);
+      payload.append("waterResistance", formData.waterResistance);
+      payload.append("warranty", formData.warranty);
+
+      // Image
       if (imageFile) {
         payload.append("image", imageFile);
       }
 
+      // Update product
       if (isEdit) {
         await api.put(`/products/${id}`, payload);
-      } else {
+      }
+
+      // Add product
+      else {
         if (!imageFile) {
           setError("Please select a product image.");
           setSubmitting(false);
           return;
         }
+
         await api.post("/products", payload);
       }
 
       navigate("/admin/products");
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to save product.");
+      setError(
+        error.response?.data?.message || "Failed to save product."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -142,9 +171,11 @@ const ProductForm = () => {
         onSubmit={handleSubmit}
         className="mt-6 space-y-5 rounded-xl border border-gray-200 bg-white p-6"
       >
-        {/* Image */}
+        {/* Product Image */}
         <div>
-          <label className="mb-2 block text-sm font-medium">Product Image</label>
+          <label className="mb-2 block text-sm font-medium">
+            Product Image
+          </label>
 
           <label
             htmlFor="image"
@@ -159,7 +190,10 @@ const ProductForm = () => {
             ) : (
               <div className="flex flex-col items-center text-gray-400">
                 <FiUploadCloud size={24} />
-                <span className="mt-2 text-xs">Upload image</span>
+
+                <span className="mt-2 text-xs">
+                  Upload image
+                </span>
               </div>
             )}
           </label>
@@ -173,8 +207,12 @@ const ProductForm = () => {
           />
         </div>
 
+        {/* Name */}
         <div>
-          <label className="mb-2 block text-sm font-medium">Name</label>
+          <label className="mb-2 block text-sm font-medium">
+            Name
+          </label>
+
           <input
             name="name"
             value={formData.name}
@@ -184,8 +222,12 @@ const ProductForm = () => {
           />
         </div>
 
+        {/* Description */}
         <div>
-          <label className="mb-2 block text-sm font-medium">Description</label>
+          <label className="mb-2 block text-sm font-medium">
+            Description
+          </label>
+
           <textarea
             name="description"
             value={formData.description}
@@ -196,9 +238,13 @@ const ProductForm = () => {
           />
         </div>
 
+        {/* Price / Discount / Stock */}
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Price (₹)</label>
+            <label className="mb-2 block text-sm font-medium">
+              Price (₹)
+            </label>
+
             <input
               name="price"
               type="number"
@@ -211,7 +257,10 @@ const ProductForm = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Discount (%)</label>
+            <label className="mb-2 block text-sm font-medium">
+              Discount (%)
+            </label>
+
             <input
               name="discount"
               type="number"
@@ -224,7 +273,10 @@ const ProductForm = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Stock</label>
+            <label className="mb-2 block text-sm font-medium">
+              Stock
+            </label>
+
             <input
               name="stock"
               type="number"
@@ -237,8 +289,12 @@ const ProductForm = () => {
           </div>
         </div>
 
+        {/* Category */}
         <div>
-          <label className="mb-2 block text-sm font-medium">Category</label>
+          <label className="mb-2 block text-sm font-medium">
+            Category
+          </label>
+
           <select
             name="category"
             value={formData.category}
@@ -246,28 +302,124 @@ const ProductForm = () => {
             required
             className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
           >
-            <option value="">Select a category</option>
+            <option value="">
+              Select a category
+            </option>
+
             {categories.map((category) => (
-              <option key={category._id} value={category._id}>
+              <option
+                key={category._id}
+                value={category._id}
+              >
                 {category.name}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Watch Details */}
+        <div className="border-t border-gray-200 pt-5">
+          <h2 className="mb-4 text-lg font-semibold">
+            Watch Details
+          </h2>
+
+          {/* Movement + Case Material */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Movement
+              </label>
+
+              <input
+                name="movement"
+                value={formData.movement}
+                onChange={handleChange}
+                placeholder="e.g. Automatic"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Case Material
+              </label>
+
+              <input
+                name="caseMaterial"
+                value={formData.caseMaterial}
+                onChange={handleChange}
+                placeholder="e.g. Stainless Steel"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+              />
+            </div>
+          </div>
+
+          {/* Strap Material + Water Resistance */}
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Strap Material
+              </label>
+
+              <input
+                name="strapMaterial"
+                value={formData.strapMaterial}
+                onChange={handleChange}
+                placeholder="e.g. Leather"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Water Resistance
+              </label>
+
+              <input
+                name="waterResistance"
+                value={formData.waterResistance}
+                onChange={handleChange}
+                placeholder="e.g. 100m"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+              />
+            </div>
+          </div>
+
+          {/* Warranty */}
+          <div className="mt-4">
+            <label className="mb-2 block text-sm font-medium">
+              Warranty
+            </label>
+
+            <input
+              name="warranty"
+              value={formData.warranty}
+              onChange={handleChange}
+              placeholder="e.g. 5 Years"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+            />
+          </div>
+        </div>
+
+        {/* Error */}
         {error && (
           <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
+        {/* Buttons */}
         <div className="flex gap-3">
           <button
             type="submit"
             disabled={submitting}
             className="rounded-lg bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
           >
-            {submitting ? "Saving..." : isEdit ? "Update Product" : "Add Product"}
+            {submitting
+              ? "Saving..."
+              : isEdit
+              ? "Update Product"
+              : "Add Product"}
           </button>
 
           <button
