@@ -334,7 +334,7 @@ const ProductForm = () => {
                 name="movement"
                 value={formData.movement}
                 onChange={handleChange}
-                placeholder="e.g. Automatic"
+                // placeholder="e.g. Automatic"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -348,7 +348,7 @@ const ProductForm = () => {
                 name="caseMaterial"
                 value={formData.caseMaterial}
                 onChange={handleChange}
-                placeholder="e.g. Stainless Steel"
+                // placeholder="e.g. Stainless Steel"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -365,7 +365,7 @@ const ProductForm = () => {
                 name="strapMaterial"
                 value={formData.strapMaterial}
                 onChange={handleChange}
-                placeholder="e.g. Leather"
+                // placeholder="e.g. Leather"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -379,7 +379,7 @@ const ProductForm = () => {
                 name="waterResistance"
                 value={formData.waterResistance}
                 onChange={handleChange}
-                placeholder="e.g. 100m"
+                // placeholder="e.g. 100m"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -395,7 +395,7 @@ const ProductForm = () => {
               name="warranty"
               value={formData.warranty}
               onChange={handleChange}
-              placeholder="e.g. 5 Years"
+              // placeholder="e.g. 5 Years"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
             />
           </div>
