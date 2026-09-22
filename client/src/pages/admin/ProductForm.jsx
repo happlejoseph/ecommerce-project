@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FiUploadCloud } from "react-icons/fi";
@@ -17,6 +19,11 @@ const ProductForm = () => {
     discount: "",
     stock: "",
     category: "",
+    movement: '',
+    caseMaterial: '',
+    strapMaterial: '',
+    waterResistance: '',
+    warranty: ''
   });
 
   const [imageFile, setImageFile] = useState(null);
