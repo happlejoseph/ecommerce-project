@@ -32,8 +32,7 @@ const reviewSchema = new mongoose.Schema({
 
 }, {timestamps: true});
 
-// one review per user per product - trying to create a second
-// review for the same product will throw a duplicate key error
+
 reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
 const Review = mongoose.model('Review', reviewSchema);

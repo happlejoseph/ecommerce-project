@@ -1,7 +1,6 @@
 
 
 import mongoose from "mongoose";
-import Category from "./categoryModel.js";
 
 
 const productSchema = new mongoose.Schema({
@@ -46,22 +45,50 @@ const productSchema = new mongoose.Schema({
 
     category: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
+        ref: 'Category',
         required: true
     },
 
-    // cached rating stats, recalculated whenever a review is
-    // added / edited / deleted (see reviewController.js)
+    movement: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    caseMaterial: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    strapMaterial: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    waterResistance: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    warranty: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
     averageRating: {
-        type: Number,
+        type: String,
         default: 0
     },
 
-    numReviews: {
-        type: Number,
+    numReview: {
+        type: String,
         default: 0
     }
-
+    
 }, {timestamps: true});
 
 const Product = mongoose.model('Product', productSchema);

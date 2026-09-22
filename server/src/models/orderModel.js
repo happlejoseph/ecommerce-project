@@ -80,8 +80,7 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     },
 
-    // a timestamped log of every status change, used to render
-    // the order tracking timeline on the frontend
+
     statusHistory: [
         {
             status: {
@@ -95,7 +94,7 @@ const orderSchema = new mongoose.Schema({
         }
     ],
 
-    // shipment tracking info, set by admin
+
     trackingNumber: {
         type: String
     },

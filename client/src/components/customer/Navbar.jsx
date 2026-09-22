@@ -1,3 +1,5 @@
+
+
 import { useEffect, useRef, useState } from "react";
 import {
   FiSearch,
@@ -54,9 +56,7 @@ const Navbar = () => {
 
         {/* Logo */}
         <div className="shrink-0 cursor-pointer" onClick={() => navigate("/")}>
-          <h1 className="text-2xl font-bold tracking-tight">
-            E-COM
-          </h1>
+          <img src="/ora-logo.png" alt="ORA" className="h-10 w-auto"/>
         </div>
 
         {/* Search */}
