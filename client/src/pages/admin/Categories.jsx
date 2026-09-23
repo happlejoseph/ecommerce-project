@@ -5,7 +5,13 @@ import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import api from "../../services/api";
 import Loader from "../../components/common/Loader";
 
-const emptyForm = { name: "", description: "", image: "", video: "", status: true };
+const emptyForm = {
+  name: "",
+  description: "",
+  image: "",
+  video: "",
+  status: true,
+};
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -16,11 +22,13 @@ const Categories = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // GET ALL CATEGORIES
   const fetchCategories = async () => {
     setLoading(true);
 
     try {
       const response = await api.get("/categories");
+
       setCategories(response.data.categories || []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
@@ -33,6 +41,7 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
+  // OPEN ADD FORM
   const openAddForm = () => {
     setEditingId(null);
     setFormData(emptyForm);
@@ -40,8 +49,10 @@ const Categories = () => {
     setShowForm(true);
   };
 
+  // OPEN EDIT FORM
   const openEditForm = (category) => {
     setEditingId(category._id);
+
     setFormData({
       name: category.name,
       description: category.description || "",
@@ -49,86 +60,116 @@ const Categories = () => {
       video: category.video || "",
       status: category.status !== false,
     });
+
     setError("");
     setShowForm(true);
   };
 
+  // HANDLE INPUT CHANGES
   const handleChange = (event) => {
     const { name, value, type, checked, files } = event.target;
 
     setFormData((previous) => ({
       ...previous,
       [name]:
-      type === "checkbox"
-      ? checked
-      : type === "file"
-      ? files[0]
-      : value,
+        type === "checkbox"
+          ? checked
+          : type === "file"
+          ? files[0]
+          : value,
     }));
   };
 
+  // ADD / UPDATE CATEGORY
   const handleSubmit = async (event) => {
-  event.preventDefault();
-  setError("");
-  setSubmitting(true);
+    event.preventDefault();
 
-  const data = new FormData();
+    setError("");
+    setSubmitting(true);
 
-  data.append("name", formData.name);
-  data.append("description", formData.description);
-  data.append("status", String(formData.status));
+    try {
+      const data = new FormData();
 
-  if (formData.image) {
-      data.append("image", formData.image);
-  }
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      data.append("status", String(formData.status));
 
-if (formData.video instanceof File) {
-    data.append("video", formData.video);
-}
+      // Image is currently an image URL
+      if (formData.image) {
+        data.append("image", formData.image);
+      }
 
-    console.log("Form data:");
+      // Video is a file
+      if (formData.video instanceof File) {
+        data.append("video", formData.video);
+      }
 
-    for (const [key, value] of data.entries()) {
-      console.log(key, value);
+      // Check FormData in browser console
+      console.log("Form data:");
+
+      for (const [key, value] of data.entries()) {
+        console.log(key, value);
+      }
+
+      // UPDATE
+      if (editingId) {
+        await api.put(`/categories/${editingId}`, data);
+      }
+
+      // ADD
+      else {
+        await api.post("/categories", data);
+      }
+
+      // Close modal
+      setShowForm(false);
+
+      // Refresh categories
+      fetchCategories();
+    } catch (error) {
+      console.error("Category save error:", error);
+
+      setError(
+        error.response?.data?.message ||
+          "Failed to save category."
+      );
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-    if (editingId) {
-      await api.put(`/categories/${editingId}`, data);
-    } else {
-      await api.post("/categories", data);
-    }
-
-    setShowForm(false);
-    fetchCategories();
-
-  } catch (error) {
-    console.error("Category save error:", error);
-    setError(error.response?.data?.message || "Failed to save category.");
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  // DELETE CATEGORY
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this category?")) return;
 
     try {
       await api.delete(`/categories/${id}`);
-      setCategories((previous) => previous.filter((category) => category._id !== id));
+
+      setCategories((previous) =>
+        previous.filter((category) => category._id !== id)
+      );
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to delete category.");
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete category."
+      );
     }
   };
 
+  // LOADING
   if (loading) {
     return <Loader label="Loading categories..." />;
   }
 
   return (
     <div>
+      {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Categories</h1>
+          <h1 className="text-2xl font-bold">
+            Categories
+          </h1>
+
           <p className="mt-1 text-sm text-gray-500">
             Organize your products into categories.
           </p>
@@ -143,6 +184,7 @@ if (formData.video instanceof File) {
         </button>
       </div>
 
+      {/* CATEGORY CARDS */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {categories.map((category) => (
           <div
@@ -151,7 +193,10 @@ if (formData.video instanceof File) {
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold">{category.name}</h3>
+                <h3 className="font-semibold">
+                  {category.name}
+                </h3>
+
                 <p className="mt-1 line-clamp-2 text-xs text-gray-500">
                   {category.description || "No description"}
                 </p>
@@ -164,10 +209,13 @@ if (formData.video instanceof File) {
                     : "bg-gray-100 text-gray-500"
                 }`}
               >
-                {category.status !== false ? "Active" : "Inactive"}
+                {category.status !== false
+                  ? "Active"
+                  : "Inactive"}
               </span>
             </div>
 
+            {/* ACTION BUTTONS */}
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => openEditForm(category)}
@@ -178,7 +226,9 @@ if (formData.video instanceof File) {
               </button>
 
               <button
-                onClick={() => handleDelete(category._id)}
+                onClick={() =>
+                  handleDelete(category._id)
+                }
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
               >
                 <FiTrash2 size={13} />
@@ -189,19 +239,23 @@ if (formData.video instanceof File) {
         ))}
       </div>
 
+      {/* NO CATEGORIES */}
       {categories.length === 0 && (
         <p className="mt-10 text-center text-sm text-gray-500">
           No categories yet. Add your first category.
         </p>
       )}
 
-      {/* Modal */}
+      {/* MODAL */}
       {showForm && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-6">
           <div className="w-full max-w-md rounded-2xl bg-white p-6">
+            {/* MODAL HEADER */}
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-bold">
-                {editingId ? "Edit Category" : "Add Category"}
+                {editingId
+                  ? "Edit Category"
+                  : "Add Category"}
               </h2>
 
               <button
@@ -212,9 +266,17 @@ if (formData.video instanceof File) {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* FORM */}
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
+              {/* NAME */}
               <div>
-                <label className="mb-2 block text-sm font-medium">Name</label>
+                <label className="mb-2 block text-sm font-medium">
+                  Name
+                </label>
+
                 <input
                   name="name"
                   value={formData.name}
@@ -224,10 +286,12 @@ if (formData.video instanceof File) {
                 />
               </div>
 
+              {/* DESCRIPTION */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Description
                 </label>
+
                 <textarea
                   name="description"
                   value={formData.description}
@@ -237,10 +301,12 @@ if (formData.video instanceof File) {
                 />
               </div>
 
+              {/* IMAGE URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Image URL
                 </label>
+
                 <input
                   name="image"
                   value={formData.image}
@@ -250,20 +316,22 @@ if (formData.video instanceof File) {
                 />
               </div>
 
+              {/* VIDEO */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
-                  Brand Video URL
+                  Brand Video
                 </label>
 
                 <input
-                name="video"
-                type="file"
-                accept="video/*"
-                onChange={handleChange}
-                className="w-full rounded-lg border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
+                  name="video"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
                 />
               </div>
 
+              {/* STATUS */}
               {editingId && (
                 <label className="flex items-center gap-2 text-sm font-medium">
                   <input
@@ -272,22 +340,29 @@ if (formData.video instanceof File) {
                     checked={formData.status}
                     onChange={handleChange}
                   />
+
                   Active
                 </label>
               )}
 
+              {/* ERROR */}
               {error && (
                 <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
                   {error}
                 </div>
               )}
 
+              {/* SUBMIT */}
               <button
                 type="submit"
                 disabled={submitting}
                 className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
               >
-                {submitting ? "Saving..." : editingId ? "Update Category" : "Add Category"}
+                {submitting
+                  ? "Saving..."
+                  : editingId
+                  ? "Update Category"
+                  : "Add Category"}
               </button>
             </form>
           </div>
