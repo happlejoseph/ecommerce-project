@@ -72,20 +72,19 @@ const Categories = () => {
   setError("");
   setSubmitting(true);
 
-  try {
-    const data = new FormData();
+  const data = new FormData();
 
-    data.append("name", formData.name);
-    data.append("description", formData.description);
-    data.append("status", String(formData.status));
+  data.append("name", formData.name);
+  data.append("description", formData.description);
+  data.append("status", String(formData.status));
 
-    if (formData.image) {
+  if (formData.image) {
       data.append("image", formData.image);
-    }
+  }
 
-    if (formData.video instanceof File) {
-      data.append("video", formData.video);
-    }
+if (formData.video instanceof File) {
+    data.append("video", formData.video);
+}
 
     console.log("Form data:");
 

@@ -13,7 +13,7 @@ export const addCategory = async(req, res)=> {
         console.log("UPDATE BODY:", req.body);
         console.log("UPDATE FILE:", req.file);
 
-        const {name, description, image} = req.body || {};
+        const {name, description, image} = req.body;
 
         if(!name) {
             return res.status(400).json({
@@ -121,7 +121,7 @@ export const updateCategory = async(req, res)=> {
 
     try {
 
-        const {name, description, image, status} = req.body || {};
+        const {name, description, image, status} = req.body;
 
         const category = await Category.findById(req.params.id);
 
