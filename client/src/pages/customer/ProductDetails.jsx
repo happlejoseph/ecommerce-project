@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FiHeart, FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
+import { FiHeart, FiMinus, FiPlus, FiShoppingCart,} from "react-icons/fi";
+
 import api from "../../services/api";
 import Loader from "../../components/common/Loader";
 import { useAuth } from "../../context/AuthContext";
@@ -15,6 +16,7 @@ import ReviewsSection from "../../components/customer/ReviewsSection";
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const { isAuthenticated } = useAuth();
   const { addToCart, isInCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
@@ -25,12 +27,14 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
 
+  // GET PRODUCT
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
 
       try {
         const response = await api.get(`/products/${id}`);
+
         setProduct(response.data.product || response.data);
         setQuantity(1);
       } catch (error) {
@@ -44,10 +48,12 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
+  // LOADING
   if (loading) {
     return <Loader label="Loading product..." />;
   }
 
+  // PRODUCT NOT FOUND
   if (!product) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -60,18 +66,22 @@ const ProductDetails = () => {
   const inCart = isInCart(product._id);
   const outOfStock = product.stock <= 0;
 
+  // CALCULATE FINAL PRICE
   const finalPrice =
     product.discount > 0
-      ? Math.round(product.price * (1 - product.discount / 100))
+      ? Math.round(
+          product.price * (1 - product.discount / 100)
+        )
       : product.price;
 
+  // ADD TO CART
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    // Already in cart -> just take them to the cart page
+    // Already in cart -> go to cart
     if (inCart) {
       navigate("/cart");
       return;
@@ -81,10 +91,15 @@ const ProductDetails = () => {
 
     try {
       await addToCart(product._id, quantity);
-      showToast(`${product.name} added to cart`, "success");
+
+      showToast(
+        `${product.name} added to cart`,
+        "success"
+      );
     } catch (error) {
       showToast(
-        error.response?.data?.message || "Failed to add to cart",
+        error.response?.data?.message ||
+          "Failed to add to cart",
         "error"
       );
     } finally {
@@ -92,6 +107,7 @@ const ProductDetails = () => {
     }
   };
 
+  // TOGGLE WISHLIST
   const handleToggleWishlist = async () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -101,7 +117,10 @@ const ProductDetails = () => {
     try {
       await toggleWishlist(product._id);
     } catch (error) {
-      console.error("Failed to update wishlist:", error);
+      console.error(
+        "Failed to update wishlist:",
+        error
+      );
     }
   };
 
@@ -109,7 +128,7 @@ const ProductDetails = () => {
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
 
-        {/* Image */}
+        {/* IMAGE */}
         <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100">
           <img
             src={product.image?.url || product.image}
@@ -118,33 +137,54 @@ const ProductDetails = () => {
           />
         </div>
 
-        {/* Info */}
+        {/* PRODUCT INFO */}
         <div>
+
+          {/* CATEGORY / BRAND */}
           {product.category?.name && (
             <span className="text-xs font-medium uppercase tracking-widest text-gray-400">
               {product.category.name}
             </span>
           )}
 
-          <h1 className="mt-2 text-3xl font-bold">{product.name}</h1>
+          {/* PRODUCT NAME */}
+          <h1 className="mt-2 text-3xl font-bold">
+            {product.name}
+          </h1>
 
+          {/* RATING */}
           <div className="mt-2 flex items-center gap-2">
-            <StarRating rating={product.averageRating || 0} readOnly size={16} />
+            <StarRating
+              rating={product.averageRating || 0}
+              readOnly
+              size={16}
+            />
+
             <span className="text-xs text-gray-500">
               {product.numReviews > 0
-                ? `${product.averageRating?.toFixed(1)} (${product.numReviews} review${product.numReviews === 1 ? "" : "s"})`
+                ? `${product.averageRating?.toFixed(
+                    1
+                  )} (${product.numReviews} review${
+                    product.numReviews === 1
+                      ? ""
+                      : "s"
+                  })`
                 : "No reviews yet"}
             </span>
           </div>
 
+          {/* PRICE */}
           <div className="mt-4 flex items-center gap-3">
-            <span className="text-3xl font-bold">₹{finalPrice}</span>
+            <span className="text-3xl font-bold">
+              ₹{finalPrice}
+            </span>
 
             {product.discount > 0 && (
               <>
                 <span className="text-lg text-gray-400 line-through">
                   ₹{product.price}
                 </span>
+
                 <span className="rounded-md bg-black px-2.5 py-1 text-xs font-semibold text-white">
                   {product.discount}% OFF
                 </span>
@@ -152,28 +192,116 @@ const ProductDetails = () => {
             )}
           </div>
 
+          {/* DESCRIPTION */}
           <p className="mt-6 leading-relaxed text-gray-600">
             {product.description}
           </p>
 
+          {/* WATCH DETAILS */}
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold">
+              Watch Details
+            </h2>
+
+            <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
+
+              {/* MOVEMENT */}
+              {product.movement && (
+                <div className="flex justify-between py-3 text-sm">
+                  <span className="text-gray-500">
+                    Movement
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {product.movement}
+                  </span>
+                </div>
+              )}
+
+              {/* CASE MATERIAL */}
+              {product.caseMaterial && (
+                <div className="flex justify-between py-3 text-sm">
+                  <span className="text-gray-500">
+                    Case Material
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {product.caseMaterial}
+                  </span>
+                </div>
+              )}
+
+              {/* STRAP MATERIAL */}
+              {product.strapMaterial && (
+                <div className="flex justify-between py-3 text-sm">
+                  <span className="text-gray-500">
+                    Strap Material
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {product.strapMaterial}
+                  </span>
+                </div>
+              )}
+
+              {/* WATER RESISTANCE */}
+              {product.waterResistance && (
+                <div className="flex justify-between py-3 text-sm">
+                  <span className="text-gray-500">
+                    Water Resistance
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {product.waterResistance}
+                  </span>
+                </div>
+              )}
+
+              {/* WARRANTY */}
+              {product.warranty && (
+                <div className="flex justify-between py-3 text-sm">
+                  <span className="text-gray-500">
+                    Warranty
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {product.warranty}
+                  </span>
+                </div>
+              )}
+
+            </div>
+          </div>
+
+          {/* STOCK */}
           <div className="mt-4 text-sm">
             {outOfStock ? (
-              <span className="font-semibold text-red-600">Out of stock</span>
+              <span className="font-semibold text-red-600">
+                Out of stock
+              </span>
             ) : (
               <span className="text-gray-500">
-                {product.stock} item{product.stock === 1 ? "" : "s"} in stock
+                {product.stock} item
+                {product.stock === 1 ? "" : "s"} in stock
               </span>
             )}
           </div>
 
-          {/* Quantity */}
+          {/* QUANTITY */}
           {!outOfStock && (
             <div className="mt-6 flex items-center gap-4">
-              <span className="text-sm font-medium">Quantity</span>
+              <span className="text-sm font-medium">
+                Quantity
+              </span>
 
               <div className="flex items-center rounded-lg border border-gray-300">
+
                 <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  onClick={() =>
+                    setQuantity((q) =>
+                      Math.max(1, q - 1)
+                    )
+                  }
                   className="flex h-10 w-10 items-center justify-center hover:bg-gray-50"
                   aria-label="Decrease quantity"
                 >
@@ -186,19 +314,24 @@ const ProductDetails = () => {
 
                 <button
                   onClick={() =>
-                    setQuantity((q) => Math.min(product.stock, q + 1))
+                    setQuantity((q) =>
+                      Math.min(product.stock, q + 1)
+                    )
                   }
                   className="flex h-10 w-10 items-center justify-center hover:bg-gray-50"
                   aria-label="Increase quantity"
                 >
                   <FiPlus size={14} />
                 </button>
+
               </div>
             </div>
           )}
 
-          {/* Actions */}
+          {/* ACTIONS */}
           <div className="mt-8 flex gap-3">
+
+            {/* ADD TO CART */}
             <button
               onClick={handleAddToCart}
               disabled={addingToCart || outOfStock}
@@ -209,6 +342,7 @@ const ProductDetails = () => {
               }`}
             >
               <FiShoppingCart size={18} />
+
               {outOfStock
                 ? "Out of Stock"
                 : addingToCart
@@ -218,6 +352,7 @@ const ProductDetails = () => {
                 : "Add to Cart"}
             </button>
 
+            {/* WISHLIST */}
             <button
               onClick={handleToggleWishlist}
               className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border transition ${
@@ -229,10 +364,12 @@ const ProductDetails = () => {
             >
               <FiHeart size={20} />
             </button>
+
           </div>
         </div>
       </div>
 
+      {/* REVIEWS */}
       <ReviewsSection
         productId={product._id}
         averageRating={product.averageRating || 0}
