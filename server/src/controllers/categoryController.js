@@ -10,7 +10,7 @@ export const addCategory = async(req, res)=> {
 
     try {
 
-        const {name, description, image} = req.body;
+        const {name, description, image} = req.body || {};
 
         if(!name) {
             return res.status(400).json({
