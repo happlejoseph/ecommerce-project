@@ -58,30 +58,48 @@ const Categories = () => {
 
     setFormData((previous) => ({
       ...previous,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox"
+      ? checked
+      :type === 'file'
+      ? files[0]
+      : value,
     }));
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
-    setSubmitting(true);
+  event.preventDefault();
+  setError("");
+  setSubmitting(true);
 
-    try {
-      if (editingId) {
-        await api.put(`/categories/${editingId}`, formData);
-      } else {
-        await api.post("/categories", formData);
-      }
+  try {
+    const data = new FormData();
 
-      setShowForm(false);
-      fetchCategories();
-    } catch (error) {
-      setError(error.response?.data?.message || "Failed to save category.");
-    } finally {
-      setSubmitting(false);
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("status", formData.status);
+
+    if (formData.image) {
+      data.append("image", formData.image);
     }
-  };
+
+    if (formData.video) {
+      data.append("video", formData.video);
+    }
+
+    if (editingId) {
+      await api.put(`/categories/${editingId}`, data);
+    } else {
+      await api.post("/categories", data);
+    }
+
+    setShowForm(false);
+    fetchCategories();
+  } catch (error) {
+    setError(error.response?.data?.message || "Failed to save category.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this category?")) return;
@@ -231,9 +249,9 @@ const Categories = () => {
 
                 <input
                 name="video"
-                value={formData.video}
+                type="file"
+                accept="video/*"
                 onChange={handleChange}
-                placeholder="https://..."
                 className="w-full rounded-lg border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
                 />
               </div>
