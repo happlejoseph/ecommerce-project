@@ -12,6 +12,9 @@ import { useWishlist } from "../../context/WishlistContext";
 import { useToast } from "../../context/ToastContext";
 import StarRating from "../../components/customer/StarRating";
 import ReviewsSection from "../../components/customer/ReviewsSection";
+import VirtualTryOn from "../../components/customer/VirtualTryOn";
+
+
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -26,6 +29,8 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [setShowTryOn, setShowTryOn] = useState(false);
+
 
   // GET PRODUCT
   useEffect(() => {
@@ -366,6 +371,20 @@ const ProductDetails = () => {
             </button>
 
           </div>
+
+          {/* VIRTUAL TRY */}
+          <button
+          onClick={()=> setShowTryOn(true)}
+          className="mt-4 w-full rounded-lg bg-black py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            Virtual Try
+          </button>
+          
+          {showTryOn && (
+            <div className="mt-4">
+              <VirtualTryOn/>
+            </div>
+          )}
         </div>
       </div>
 
