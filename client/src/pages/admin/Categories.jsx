@@ -1,9 +1,11 @@
+
+
 import { useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import api from "../../services/api";
 import Loader from "../../components/common/Loader";
 
-const emptyForm = { name: "", description: "", image: "", status: true };
+const emptyForm = { name: "", description: "", image: "", video: "", status: true };
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -44,6 +46,7 @@ const Categories = () => {
       name: category.name,
       description: category.description || "",
       image: category.image || "",
+      video: category.video || "",
       status: category.status !== false,
     });
     setError("");
@@ -218,6 +221,20 @@ const Categories = () => {
                   onChange={handleChange}
                   placeholder="https://..."
                   className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium">
+                  Brand Video URL
+                </label>
+
+                <input
+                name="video"
+                value={formData.video}
+                onChange={handleChange}
+                placeholder="https://..."
+                className="w-full rounded-lg border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
                 />
               </div>
 

@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
@@ -18,7 +20,7 @@ const CategoryProducts = () => {
     sort: "newest",
   });
 
-  // Step 1: resolve the URL category name (e.g. "shoes") to its actual _id
+  
   useEffect(() => {
     const resolveCategory = async () => {
       try {
@@ -39,7 +41,7 @@ const CategoryProducts = () => {
     resolveCategory();
   }, [category]);
 
-  // Step 2: fetch products filtered by that category id + any active filters
+  
   useEffect(() => {
     if (!categoryDoc) return;
 
@@ -87,7 +89,7 @@ const CategoryProducts = () => {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
 
-        {/* Filters (category hidden - this page is already scoped to one) */}
+        
         <div className="lg:col-span-1">
           <ProductFilters filters={filters} onChange={setFilters} hideCategory />
         </div>

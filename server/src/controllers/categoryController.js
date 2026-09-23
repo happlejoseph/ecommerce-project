@@ -10,7 +10,7 @@ export const addCategory = async(req, res)=> {
 
     try {
 
-        const {name, description, image} = req.body;
+        const {name, description, image, video} = req.body;
 
         if(!name) {
             return res.status(400).json({
@@ -27,7 +27,7 @@ export const addCategory = async(req, res)=> {
         }
 
         const category = await Category.create({
-            name, description, image
+            name, description, image, video
         })
 
         res.status(201).json({
@@ -104,12 +104,12 @@ export const updateCategory = async(req, res)=> {
 
     try {
 
-        const {name, description, image, status} = req.body;
+        const {name, description, image, vodeo, status} = req.body;
 
         const category = await Category.findByIdAndUpdate(
             req.params.id,
             {
-                name, description, image, status
+                name, description, image, video, status
             },
             {
                 new: true

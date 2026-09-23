@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FiCheck } from "react-icons/fi";
@@ -20,7 +22,7 @@ const returnStatusStyles = {
   refunded: "bg-green-50 text-green-700",
 };
 
-// the standard order lifecycle, used to render the tracking timeline
+
 const TRACKING_STEPS = ["pending", "confirmed", "shipping", "delivered"];
 
 const OrderDetails = () => {
@@ -50,7 +52,7 @@ const OrderDetails = () => {
 
   useEffect(() => {
     fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [id]);
 
   const handleCancel = async () => {
