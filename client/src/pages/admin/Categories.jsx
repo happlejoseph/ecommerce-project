@@ -54,13 +54,14 @@ const Categories = () => {
   };
 
   const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
+    const { name, value, type, checked, files } = event.target;
 
     setFormData((previous) => ({
       ...previous,
-      [name]: type === "checkbox"
+      [name]:
+      type === "checkbox"
       ? checked
-      :type === 'file'
+      : type === "file"
       ? files[0]
       : value,
     }));
