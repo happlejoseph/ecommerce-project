@@ -10,6 +10,9 @@ export const addCategory = async(req, res)=> {
 
     try {
 
+        console.log("UPDATE BODY:", req.body);
+        console.log("UPDATE FILE:", req.file);
+
         const {name, description, image} = req.body || {};
 
         if(!name) {
