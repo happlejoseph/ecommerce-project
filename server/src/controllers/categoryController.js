@@ -118,7 +118,7 @@ export const updateCategory = async(req, res)=> {
 
     try {
 
-        const {name, description, image, status} = req.body;
+        const {name, description, image, status} = req.body || {};
 
         const category = await Category.findById(req.params.id);
 
