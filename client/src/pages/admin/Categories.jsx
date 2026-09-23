@@ -77,14 +77,20 @@ const Categories = () => {
 
     data.append("name", formData.name);
     data.append("description", formData.description);
-    data.append("status", formData.status);
+    data.append("status", String(formData.status));
 
     if (formData.image) {
       data.append("image", formData.image);
     }
 
-    if (formData.video) {
+    if (formData.video instanceof File) {
       data.append("video", formData.video);
+    }
+
+    console.log("Form data:");
+
+    for (const [key, value] of data.entries()) {
+      console.log(key, value);
     }
 
     if (editingId) {
@@ -95,7 +101,9 @@ const Categories = () => {
 
     setShowForm(false);
     fetchCategories();
+
   } catch (error) {
+    console.error("Category save error:", error);
     setError(error.response?.data?.message || "Failed to save category.");
   } finally {
     setSubmitting(false);
