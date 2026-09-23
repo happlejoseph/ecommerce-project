@@ -21,10 +21,6 @@ const categorySchema = new mongoose.Schema({
         type: String
     },
 
-    video: {
-        type: String
-    },
-
     status: {
         type: Boolean,
         default: true,

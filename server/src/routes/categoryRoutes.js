@@ -9,8 +9,8 @@ import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.post('/', auth, adminMiddleware, upload.single('video'), addCategory);
-router.put('/:id', auth, adminMiddleware, upload.single('video'), updateCategory);
+router.post('/', auth, adminMiddleware, addCategory);
+router.put('/:id', auth, adminMiddleware, updateCategory);
 router.delete('/:id', auth, adminMiddleware, deleteCategory);
 
 router.get('/', getCategories);

@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import api from "../../services/api";
@@ -9,7 +7,6 @@ const emptyForm = {
   name: "",
   description: "",
   image: "",
-  video: "",
   status: true,
 };
 
@@ -57,7 +54,6 @@ const Categories = () => {
       name: category.name,
       description: category.description || "",
       image: category.image || "",
-      video: category.video || "",
       status: category.status !== false,
     });
 
@@ -67,16 +63,11 @@ const Categories = () => {
 
   // HANDLE INPUT CHANGES
   const handleChange = (event) => {
-    const { name, value, type, checked, files } = event.target;
+    const { name, value, type, checked } = event.target;
 
     setFormData((previous) => ({
       ...previous,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "file"
-          ? files[0]
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -88,44 +79,22 @@ const Categories = () => {
     setSubmitting(true);
 
     try {
-      const data = new FormData();
+      const data = {
+        name: formData.name,
+        description: formData.description,
+        image: formData.image,
+        status: formData.status,
+      };
 
-      data.append("name", formData.name);
-      data.append("description", formData.description);
-      data.append("status", String(formData.status));
-
-      // Image is currently an image URL
-      if (formData.image) {
-        data.append("image", formData.image);
-      }
-
-      // Video is a file
-      if (formData.video instanceof File) {
-        data.append("video", formData.video);
-      }
-
-      // Check FormData in browser console
-      console.log("Form data:");
-
-      for (const [key, value] of data.entries()) {
-        console.log(key, value);
-      }
-
-      // UPDATE
       if (editingId) {
         await api.put(`/categories/${editingId}`, data);
-      }
-
-      // ADD
-      else {
+      } else {
         await api.post("/categories", data);
       }
 
-      // Close modal
       setShowForm(false);
-
-      // Refresh categories
       fetchCategories();
+
     } catch (error) {
       console.error("Category save error:", error);
 
@@ -133,6 +102,7 @@ const Categories = () => {
         error.response?.data?.message ||
           "Failed to save category."
       );
+
     } finally {
       setSubmitting(false);
     }
@@ -148,6 +118,7 @@ const Categories = () => {
       setCategories((previous) =>
         previous.filter((category) => category._id !== id)
       );
+
     } catch (error) {
       alert(
         error.response?.data?.message ||
@@ -250,6 +221,7 @@ const Categories = () => {
       {showForm && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-6">
           <div className="w-full max-w-md rounded-2xl bg-white p-6">
+
             {/* MODAL HEADER */}
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-bold">
@@ -312,21 +284,6 @@ const Categories = () => {
                   value={formData.image}
                   onChange={handleChange}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
-                />
-              </div>
-
-              {/* VIDEO */}
-              <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Brand Video
-                </label>
-
-                <input
-                  name="video"
-                  type="file"
-                  accept="video/*"
-                  onChange={handleChange}
                   className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-black"
                 />
               </div>
