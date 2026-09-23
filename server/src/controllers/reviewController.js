@@ -73,3 +73,35 @@ export const addReview = async(req, res)=> {
         });
     }
 }
+
+
+
+
+export const deleteReview = async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.id);
+
+        if (!review) {
+            return res.status(404).json({
+                message: "Review not found"
+            });
+        }
+
+        if (review.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "You can delete only your own review"
+            });
+        }
+
+        await review.deleteOne();
+
+        res.status(200).json({
+            message: "Review deleted successfully"
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
