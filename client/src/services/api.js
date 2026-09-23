@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: "https://ecommerce-project-3hyo.onrender.com/api",
 });
 
-// Attach auth token to every request if present
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -17,7 +17,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto logout on invalid/expired token
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
