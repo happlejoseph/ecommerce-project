@@ -29,7 +29,7 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [setShowTryOn, setShowTryOn] = useState(false);
+  const [ShowTryOn, setShowTryOn] = useState(false);
 
 
   // GET PRODUCT
