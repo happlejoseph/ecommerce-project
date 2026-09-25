@@ -99,7 +99,7 @@ const VirtualTryOn = () => {
                 const wrist = hand[0];
 
                 hand.forEach((landmark, index)=> {
-                  const dot = landmarkerRefs.current[index];
+                  const dot = landmarkRefs.current[index];
 
                   if(dot && videoRef.current) {
                     const video = videoRef.current;
