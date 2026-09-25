@@ -13,7 +13,7 @@ const VirtualTryOn = () => {
 
   const wristMarkerRef = useRef(null);
 
-  const landmarkerRefs = useRef([]);
+  const landmarkRefs = useRef([]);
 
   // const frameCountRef = useRef(0);
 
