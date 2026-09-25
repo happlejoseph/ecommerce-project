@@ -21,7 +21,7 @@ const VirtualTryOn = () => {
       try {
 
         const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
+          "/mediapipe/wasm"
         );
 
 
@@ -50,6 +50,7 @@ const VirtualTryOn = () => {
 
 
     const startCamera = async () => {
+
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: true,
@@ -59,7 +60,9 @@ const VirtualTryOn = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      } catch (error) {
+      }
+      
+      catch (error) {
         console.error("Camera access failed:", error);
       }
     };
@@ -86,8 +89,8 @@ const VirtualTryOn = () => {
 
                 console.log('wrist:', wrist);
 
-                if(wristMarkerRef.current && videoRef.current) {
-                    const video = videoRef.current;
+                if(wristMarkerRef.current && vint) {
+                    const video = videoRef.current;deoRef.curre
 
                     const x = wrist.x * video.clientWidth;
                     const y = wrist.y * video.clientHeight;
