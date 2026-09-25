@@ -13,6 +13,8 @@ const VirtualTryOn = () => {
 
   const wristMarkerRef = useRef(null);
 
+  const frameCountRef = useRef(0);
+
   useEffect(() => {
     let stream;
 
@@ -68,6 +70,13 @@ const VirtualTryOn = () => {
     };
 
     const detectHand = ()=> {
+
+      frameCountRef.current++;
+
+      if(frameCountRef.current % 60 === 0) {
+        console.log('60 detection frames compilited');
+        
+      }
 
         if(!videoRef.current || !handLandmarkerRef.current) {
 
