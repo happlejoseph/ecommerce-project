@@ -90,7 +90,7 @@ const VirtualTryOn = () => {
                 console.log('wrist:', wrist);
 
                 if(wristMarkerRef.current && videoRef.current) {
-                    const video = videoRef.current;deoRef.curre
+                    const video = videoRef.current;
 
                     const x = wrist.x * video.clientWidth;
                     const y = wrist.y * video.clientHeight;
