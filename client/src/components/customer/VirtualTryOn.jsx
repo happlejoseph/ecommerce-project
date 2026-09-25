@@ -13,6 +13,8 @@ const VirtualTryOn = () => {
 
   const wristMarkerRef = useRef(null);
 
+  const landmarkerRefs = useRef([]);
+
   // const frameCountRef = useRef(0);
 
   useEffect(() => {
@@ -96,6 +98,21 @@ const VirtualTryOn = () => {
 
                 const wrist = hand[0];
 
+                hand.forEach((landmark, index)=> {
+                  const dot = landmarkerRefs.current[index];
+
+                  if(dot && videoRef.current) {
+                    const video = videoRef.current;
+
+                    const x = landmark.x * video.clientWidth;
+                    const y = landmark.y * video.clientHeight;
+
+                    dot.style.display = 'block';
+                    dot.style.left = `${x}px`;
+                    dot.style.top = `${y}px`;
+                  }
+                });
+
                 if(wristMarkerRef.current && videoRef.current) {
                     const video = videoRef.current;
 
@@ -146,6 +163,19 @@ return () => {
       className="w-full"
     />
 
+    {Array.from({ length: 21 }).map((_, index) => (
+      <div
+        key={index}
+        ref={(element) => {
+          landmarkRefs.current[index] = element;
+        }}
+        className="absolute h-2 w-2 rounded-full bg-blue-500"
+        style={{
+          display: "none",
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+  ))}
     <div
       ref={wristMarkerRef}
       className="pointer-events-none absolute h-5 w-5 rounded-full bg-red-500"
