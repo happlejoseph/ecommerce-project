@@ -19,6 +19,14 @@ const VirtualTryOn = () => {
 
   const watchRef = useRef(null);
 
+  const smoothXRef = useRef(null);
+
+  const smoothYRef = useRef(null);
+
+  const smoothSizeRef = useRef(null);
+
+  const smoothAngleRef = useRef(null);
+
   useEffect(() => {
     let stream;
 
@@ -121,7 +129,23 @@ const VirtualTryOn = () => {
 
                 const angle = Math.atan2(angleDy, angleDx) * (180 / Math.PI);
 
-                const watchSize = distance * 400;
+                const smoothAngleFactor = 0.15;
+
+                if(smoothAngleRef.current === null) {
+                  smoothAngleRef.current = angle;
+                }
+
+                smoothAngleRef.current = smoothAngleRef.current + (angle - smoothAngleRef.current) * smoothAngleFactor;
+
+                const targetWatchSize = distance * 400;
+
+                const smoothSizeFactor = 0.15;
+
+                if(smoothSizeFactor.current === null) {
+                  smoothSizeRef.current = targetWatchSize;
+                }
+
+                smoothSizeRef.current = smoothSizeRef.current + (targetWatchSize - smoothSizeRef.current) * smoothSizeFactor;
                 
 
                 hand.forEach((landmark, index)=> {
@@ -157,7 +181,7 @@ const VirtualTryOn = () => {
 
                 if(watchRef.current) {
 
-                  const offsetPixels = watchSize * 0.25;
+                  const offsetPixels = smoothSizeRef.current * 0.25;
 
                   const offsetX = (dirX * offsetPixels) / video.clientWidth;
 
@@ -167,14 +191,25 @@ const VirtualTryOn = () => {
 
                   const watchY = (wrist.y - offsetY) * video.clientHeight;
 
+                  const smoothFactor = 0.15;
+
+                if (smoothXRef.current === null) {
+                  smoothXRef.current = watchX;
+                  smoothYRef.current = watchY;
+                }
+
+                smoothXRef.current = smoothXRef.current + (watchX - smoothXRef.current) * smoothFactor;
+
+                smoothYRef.current = smoothYRef.current + (watchY - smoothYRef.current) * smoothFactor;
+
                   watchRef.current.style.display = "block";
-                  watchRef.current.style.left = `${watchX}px`;
-                  watchRef.current.style.top = `${watchY}px`;
+                  watchRef.current.style.left = `${smoothXRef.current}px`;
+                  watchRef.current.style.top = `${smoothYRef.current}px`;
 
-                  watchRef.current.style.width = `${watchSize}px`;
-                  watchRef.current.style.height = `${watchSize}px`;
+                  watchRef.current.style.width = `${smoothSizeRef.current}px`;
+                  watchRef.current.style.height = `${smoothSizeRef.current}px`;
 
-                  watchRef.current.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+                  watchRef.current.style.transform = `translate(-50%, -50%) rotate(${smoothAngleRef.current}deg)`;
               }                       
                 }
             }
