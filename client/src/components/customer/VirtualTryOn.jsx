@@ -129,6 +129,9 @@ const VirtualTryOn = ({watchImage}) => {
 
                 const angle = Math.atan2(angleDy, angleDx) * (180 / Math.PI);
 
+                const tiltX = (middleBase.z - wristPoint.z) * 180;
+                const tiltY = (point2.z - point1.z) * 180;
+
                 const smoothAngleFactor = 0.15;
 
                 if(smoothAngleRef.current === null) {
@@ -137,11 +140,11 @@ const VirtualTryOn = ({watchImage}) => {
 
                 smoothAngleRef.current = smoothAngleRef.current + (angle - smoothAngleRef.current) * smoothAngleFactor;
 
-                const targetWatchSize = distance * 500;
+                const targetWatchSize = distance * 600;
 
                 const smoothSizeFactor = 0.15;
 
-                if(smoothSizeFactor.current === null) {
+                if(smoothSizeRef.current === null) {
                   smoothSizeRef.current = targetWatchSize;
                 }
 
@@ -181,7 +184,7 @@ const VirtualTryOn = ({watchImage}) => {
 
                 if(watchRef.current) {
 
-                  const offsetPixels = smoothSizeRef.current * 0.32;
+                  const offsetPixels = smoothSizeRef.current * 0.35;
 
                   const offsetX = (dirX * offsetPixels) / video.clientWidth;
 
@@ -209,7 +212,12 @@ const VirtualTryOn = ({watchImage}) => {
                   watchRef.current.style.width = `${smoothSizeRef.current}px`;
                   watchRef.current.style.height = `${smoothSizeRef.current}px`;
 
-                  watchRef.current.style.transform = `translate(-50%, -50%) rotate(${smoothAngleRef.current}deg)`;
+                  watchRef.current.style.transform =
+                    `translate(-50%, -50%)
+                    perspective(600px)
+                    rotateX(${tiltX}deg)
+                    rotateY(${tiltY}deg)
+                    rotateZ(${smoothAngleRef.current}deg)`
               }                       
                 }
             }
