@@ -6,12 +6,36 @@ import Product from "../models/productModel.js";
 
 
 
-// CREATE ORDER //
-export const createOrder = async(req, res)=> {
+export const createOrder = async (req, res) => {
 
     try {
         
-        const {shippingAddress} = req.body;
+        const {shippingAddress, paymentMethod} = req.body;
+
+        if(!shippingAddress) {
+            return res.status(400).json({
+                message: "Shipping address is required"
+            });
+        }
+
+        if(!paymentMethod) {
+            return res.status(400).json({
+                message: "Payment method is required"
+            });
+        }
+
+        if(!["cod", "online"].includes(paymentMethod)) {
+            return res.status(400).json({
+                message: "Invalid payment method"
+            });
+        }
+
+
+        if(paymentMethod === "online") {
+            return res.status(400).json({
+                message: "Please use online payment checkout"
+            });
+        }
 
         const cart = await Cart.findOne({
             user: req.user.id
@@ -19,25 +43,28 @@ export const createOrder = async(req, res)=> {
 
         if(!cart) {
             return res.status(404).json({
-                message: 'Cart not found'
+                message: "Cart not found"
             });
         }
 
         if(cart.items.length === 0) {
             return res.status(400).json({
-                message: 'Cart is empty'
+                message: "Cart is empty"
             });
         }
 
         const orderItems = [];
 
-        for(const item of cart.items) {
+        let totalAmount = 0;
 
-            const product = await Product.findById(item.product);
+        for(const item of cart.items) {
+            const product = await Product.findById(
+                item.product
+            );
 
             if(!product) {
                 return res.status(404).json({
-                    message: 'Product not found'
+                    message: "Product not found"
                 });
             }
 
@@ -47,25 +74,48 @@ export const createOrder = async(req, res)=> {
                 });
             }
 
+            const price = product.discount > 0 ? Math.round(product.price * (1 - product.discount / 100)): product.price;
+
+            totalAmount += price * item.quantity;
+
             orderItems.push({
                 product: product._id,
                 name: product.name,
                 image: product.image.url,
                 quantity: item.quantity,
-                price: product.price
+                price
+            });
+        }
+
+
+        if(totalAmount > 10000) {
+            return res.status(400).json({
+                message: "Cash on Delivery is not available for orders above ₹10,000. Please use online payment."
             });
         }
 
         const order = await Order.create({
+
             user: req.user.id,
+
             items: orderItems,
+
             shippingAddress,
+
+            paymentMethod: "cod",
+
+            paymentStatus: "pending",
+
             statusHistory: [
-                { status: 'pending' }
+                {
+                    status: "pending"
+                }
             ]
         });
 
+
         for(const item of cart.items) {
+
             await Product.findByIdAndUpdate(
                 item.product,
                 {
@@ -80,104 +130,96 @@ export const createOrder = async(req, res)=> {
 
         await cart.save();
 
-        res.status(201).json({
-            message: 'Order created successfully',
+        return res.status(201).json({
+            message: "Order created successfully",
             order
         });
-
     }
-    catch(error) {
+    
+    catch (error) {
+        console.error("Create order error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message
         });
     }
-}
+};
 
-
-
-
-// GET ORDERS //
-export const getMyOrder = async(req, res)=> {
+export const getMyOrder = async (req, res) => {
 
     try {
-
         const orders = await Order.find({
             user: req.user.id
         })
-        .populate('items.product')
-        .sort({createdAt: -1});
+            .populate("items.product")
+            .sort({
+                createdAt: -1
+            });
 
         res.status(200).json({
             orders
         });
-
     }
-    catch(error) {
-
+    
+    catch (error) {
         res.status(500).json({
             message: error.message
         });
     }
-}
+};
 
-
-
-// GET ORDER BY ID //
-export const getOrderById = async(req, res)=> {
+export const getOrderById = async (req, res) => {
 
     try {
-
         const order = await Order.findOne({
             _id: req.params.id,
             user: req.user.id
-        }).populate('items.product');
-        
-        if(!order) {
+        }).populate("items.product");
+
+        if (!order) {
             return res.status(404).json({
-                message: 'Order not found'
+                message: "Order not found"
             });
         }
 
         res.status(200).json({
             order
         });
-
-    }
-    catch(error) {
-
+    } 
+    
+    catch (error) {
         res.status(500).json({
             message: error.message
         });
     }
-}
+};
 
-
-
-// CANCEL ORDER //
-export const cancelOrder = async(req, res)=> {
-
+export const cancelOrder = async (req, res) => {
+    
     try {
-
         const order = await Order.findOne({
             _id: req.params.id,
             user: req.user.id
         });
 
-        if(!order) {
+        if (!order) {
             return res.status(404).json({
-                message: 'Order not found'
+                message: "Order not found"
             });
         }
 
-        if(order.status === 'shipping' || order.status === 'delivered' || order.status === 'cancelled') {
-            
+        if (
+            order.status === "shipping" ||
+            order.status === "delivered" ||
+            order.status === "cancelled"
+        ) {
             return res.status(400).json({
-                message: 'Order cannot be cancelled'
+                message: "Order cannot be cancelled"
             });
         }
 
         for(const item of order.items) {
+
             await Product.findByIdAndUpdate(
                 item.product,
                 {
@@ -185,41 +227,38 @@ export const cancelOrder = async(req, res)=> {
                         stock: item.quantity
                     }
                 }
-            )
+            );
         }
 
-        order.status = 'cancelled';
-        order.statusHistory.push({ status: 'cancelled' });
+        order.status = "cancelled";
+
+        order.statusHistory.push({
+            status: "cancelled"
+        });
 
         await order.save();
 
         res.status(200).json({
-            message: 'Order cancelled successfully',
+            message: "Order cancelled successfully",
             order
         });
-
-    }
-    catch(error) {
-
+    } 
+    
+    catch (error) {
         res.status(500).json({
             message: error.message
         });
     }
-}
+};
 
-
-
-
-// REQUEST RETURN //
-export const requestReturn = async(req, res)=> {
+export const requestReturn = async (req, res) => {
 
     try {
-
         const { reason } = req.body;
 
         if(!reason || !reason.trim()) {
             return res.status(400).json({
-                message: 'Please provide a reason for the return'
+                message: "Please provide a reason for the return"
             });
         }
 
@@ -230,38 +269,42 @@ export const requestReturn = async(req, res)=> {
 
         if(!order) {
             return res.status(404).json({
-                message: 'Order not found'
+                message: "Order not found"
             });
         }
 
-        if(order.status !== 'delivered') {
+        if(order.status !== "delivered") {
             return res.status(400).json({
-                message: 'Only delivered orders can be returned'
+                message:
+                    "Only delivered orders can be returned"
             });
         }
 
-        if(order.returnStatus !== 'none') {
+        if(order.returnStatus !== "none") {
             return res.status(400).json({
-                message: 'A return has already been requested for this order'
+                message:
+                    "A return has already been requested for this order"
             });
         }
 
-        order.returnStatus = 'requested';
+        order.returnStatus = "requested";
+
         order.returnReason = reason.trim();
+
         order.returnRequestedAt = new Date();
 
         await order.save();
 
         res.status(200).json({
-            message: 'Return request submitted successfully',
+            message:
+                "Return request submitted successfully",
             order
         });
-
     }
-    catch(error) {
-
+    
+    catch (error) {
         res.status(500).json({
             message: error.message
         });
     }
-}
+};

@@ -81,6 +81,27 @@ const orderSchema = new mongoose.Schema({
     },
 
 
+    paymentMethod: {
+        type: String,
+        enum: ['cod', 'online'],
+        default: 'cod'
+    },
+
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'failed'],
+        default: 'pending'
+    },
+
+    rezorpayOrderId: {
+        type: String
+    },
+
+    rezopayPaymentId: {
+        type: String
+    },
+
+
     statusHistory: [
         {
             status: {
@@ -107,7 +128,6 @@ const orderSchema = new mongoose.Schema({
         type: Date
     },
 
-    // return / refund
     returnStatus: {
         type: String,
         enum: ['none', 'requested', 'approved', 'rejected', 'refunded'],
