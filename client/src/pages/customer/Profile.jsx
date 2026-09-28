@@ -1,25 +1,30 @@
 
 
 import { useEffect, useState } from "react";
-import { FiMail, FiUser } from "react-icons/fi";
+import { FiMail, FiUser, FiEdit2, FiTrash2 } from "react-icons/fi";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const Profile = () => {
   const { user, updateStoredUser } = useAuth();
 
-  // Profile form
+
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
   });
 
-  // Addresses
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const [addresses, setAddresses] = useState([]);
   const [addressLoading, setAddressLoading] = useState(false);
+
   const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // Address form
+  const [editingAddressId, setEditingAddressId] = useState(null);
+
   const [addressForm, setAddressForm] = useState({
     label: "",
     fullName: "",
@@ -30,12 +35,6 @@ const Profile = () => {
     pincode: "",
   });
 
-  // Profile messages/loading
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  // Handle profile form
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -45,7 +44,7 @@ const Profile = () => {
     }));
   };
 
-  // Handle address form
+
   const handleAddressChange = (event) => {
     const { name, value } = event.target;
 
@@ -55,40 +54,99 @@ const Profile = () => {
     }));
   };
 
-  // Add address
+
+  const resetAddressForm = () => {
+    setAddressForm({
+      label: "",
+      fullName: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+    });
+
+    setEditingAddressId(null);
+    setShowAddressForm(false);
+  };
+
   const handleAddressSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await api.post("/user/addresses", addressForm);
+      if (editingAddressId) {
+        // UPDATE EXISTING ADDRESS
 
-      setAddresses(response.data.addresses);
+        const response = await api.put(
+          `/user/addresses/${editingAddressId}`,
+          addressForm
+        );
 
-      setAddressForm({
-        label: "",
-        fullName: "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-      });
+        setAddresses(response.data.addresses);
 
-      setShowAddressForm(false);
+        resetAddressForm();
+      } else {
+        // ADD NEW ADDRESS
+
+        const response = await api.post(
+          "/user/addresses",
+          addressForm
+        );
+
+        setAddresses(response.data.addresses);
+
+        resetAddressForm();
+      }
     } catch (error) {
       console.error(
-        "Failed to add address:",
+        "Failed to save address:",
         error.response?.data?.message || error.message
       );
     }
   };
 
-  // Delete address
+
+  const handleEditAddress = (address) => {
+    setEditingAddressId(address._id);
+
+    setAddressForm({
+      label: address.label || "",
+      fullName: address.fullName || "",
+      phone: address.phone || "",
+      address: address.address || "",
+      city: address.city || "",
+      state: address.state || "",
+      pincode: address.pincode || "",
+    });
+
+    setShowAddressForm(true);
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+
   const handleDeleteAddress = async (addressId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this address?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
-      const response = await api.delete(`/user/addresses/${addressId}`);
+      const response = await api.delete(
+        `/user/addresses/${addressId}`
+      );
 
       setAddresses(response.data.addresses);
+
+      if (editingAddressId === addressId) {
+        resetAddressForm();
+      }
     } catch (error) {
       console.error(
         "Failed to delete address:",
@@ -97,13 +155,14 @@ const Profile = () => {
     }
   };
 
-  // Fetch saved addresses
+
   useEffect(() => {
     const fetchAddresses = async () => {
       setAddressLoading(true);
 
       try {
         const response = await api.get("/user/addresses");
+
         setAddresses(response.data.addresses);
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
@@ -115,7 +174,6 @@ const Profile = () => {
     fetchAddresses();
   }, []);
 
-  // Update profile
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -124,7 +182,10 @@ const Profile = () => {
     setLoading(true);
 
     try {
-      const response = await api.put("/user/profile", formData);
+      const response = await api.put(
+        "/user/profile",
+        formData
+      );
 
       updateStoredUser({
         ...user,
@@ -135,7 +196,8 @@ const Profile = () => {
       setSuccess("Profile updated successfully!");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Failed to update profile."
+        error.response?.data?.message ||
+          "Failed to update profile."
       );
     } finally {
       setLoading(false);
@@ -144,57 +206,63 @@ const Profile = () => {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      {/* Profile heading */}
 
-      <h1 className="text-3xl font-bold">My Profile</h1>
+
+      <h1 className="text-3xl font-bold">
+        My Profile
+      </h1>
 
       <p className="mt-2 text-sm text-gray-500">
         Manage your account information.
       </p>
 
-      {/* Profile form */}
 
       <form
         onSubmit={handleSubmit}
         className="mt-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
       >
-        <div className="mb-5">
+        {/* NAME */}
+
+        <div>
           <label
             htmlFor="name"
-            className="mb-2 block text-sm font-medium"
+            className="mb-2 block text-sm font-medium text-gray-700"
           >
             Name
           </label>
 
           <div className="relative">
             <FiUser
-              size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
             />
 
             <input
               id="name"
               name="name"
+              type="text"
               value={formData.name}
               onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-300 py-3 pl-11 pr-4 text-sm outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 outline-none transition focus:border-black"
+              placeholder="Enter your name"
             />
           </div>
         </div>
 
-        <div className="mb-6">
+        {/* EMAIL */}
+
+        <div className="mt-5">
           <label
             htmlFor="email"
-            className="mb-2 block text-sm font-medium"
+            className="mb-2 block text-sm font-medium text-gray-700"
           >
             Email
           </label>
 
           <div className="relative">
             <FiMail
-              size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
             />
 
             <input
@@ -203,109 +271,149 @@ const Profile = () => {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-300 py-3 pl-11 pr-4 text-sm outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 outline-none transition focus:border-black"
+              placeholder="Enter your email"
             />
           </div>
         </div>
 
+        {/* ERROR */}
+
         {error && (
-          <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+          <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
             {error}
-          </div>
+          </p>
         )}
 
+        {/* SUCCESS */}
+
         {success && (
-          <div className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-600">
+          <p className="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-600">
             {success}
-          </div>
+          </p>
         )}
+
+        {/* SAVE PROFILE */}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
+          className="mt-6 w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>
       </form>
 
-      {/* Addresses */}
+      <div className="mt-10">
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold">My Addresses</h2>
+        <h2 className="text-xl font-semibold">
+          My Addresses
+        </h2>
 
         <p className="mt-1 text-sm text-gray-500">
           Manage your saved delivery addresses.
         </p>
 
-        {/* Add address button */}
 
-        <button
-          type="button"
-          onClick={() => setShowAddressForm(!showAddressForm)}
-          className="mt-4 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-        >
-          {showAddressForm ? "Cancel" : "Add New Address"}
-        </button>
+        {!showAddressForm && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingAddressId(null);
 
-        {/* Add address form */}
+              setAddressForm({
+                label: "",
+                fullName: "",
+                phone: "",
+                address: "",
+                city: "",
+                state: "",
+                pincode: "",
+              });
+
+              setShowAddressForm(true);
+            }}
+            className="mt-4 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            Add New Address
+          </button>
+        )}
 
         {showAddressForm && (
           <form
             onSubmit={handleAddressSubmit}
             className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-5"
           >
-            <h3 className="text-lg font-semibold">
-              Add New Address
-            </h3>
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">
+                {editingAddressId
+                  ? "Edit Address"
+                  : "Add New Address"}
+              </h3>
 
-            <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <button
+                type="button"
+                onClick={resetAddressForm}
+                className="text-sm text-gray-500 hover:text-black"
+              >
+                Cancel
+              </button>
+            </div>
+
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Address Label
               </label>
 
               <input
+                type="text"
                 name="label"
                 value={addressForm.label}
                 onChange={handleAddressChange}
-                placeholder="Home, Work, etc."
+                placeholder="Home, Work, Office..."
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Full Name
               </label>
 
               <input
+                type="text"
                 name="fullName"
                 value={addressForm.fullName}
                 onChange={handleAddressChange}
+                placeholder="Enter full name"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Phone
               </label>
 
               <input
-                name="phone"
                 type="tel"
+                name="phone"
                 value={addressForm.phone}
                 onChange={handleAddressChange}
+                placeholder="Enter phone number"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Address
               </label>
 
@@ -313,65 +421,78 @@ const Profile = () => {
                 name="address"
                 value={addressForm.address}
                 onChange={handleAddressChange}
-                required
+                placeholder="House name, street, area..."
                 rows="3"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                required
+                className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 City
               </label>
 
               <input
+                type="text"
                 name="city"
                 value={addressForm.city}
                 onChange={handleAddressChange}
+                placeholder="Enter city"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 State
               </label>
 
               <input
+                type="text"
                 name="state"
                 value={addressForm.state}
                 onChange={handleAddressChange}
+                placeholder="Enter state"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
 
+
+
             <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
                 Pincode
               </label>
 
               <input
-                name="pincode"
                 type="text"
+                name="pincode"
                 value={addressForm.pincode}
                 onChange={handleAddressChange}
+                placeholder="Enter pincode"
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-black"
               />
             </div>
+
+
 
             <button
               type="submit"
               className="mt-5 w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
             >
-              Save Address
+              {editingAddressId
+                ? "Update Address"
+                : "Save Address"}
             </button>
           </form>
         )}
-
-        {/* Saved addresses */}
 
         {addressLoading ? (
           <p className="mt-5 text-sm text-gray-500">
@@ -383,20 +504,35 @@ const Profile = () => {
           </p>
         ) : (
           <div className="mt-5 space-y-4">
+
             {addresses.map((item) => (
               <div
                 key={item._id}
                 className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
               >
-                <h3 className="font-semibold">
-                  {item.label}
-                </h3>
 
-                <p className="mt-2 text-sm text-gray-700">
-                  {item.fullName}
-                </p>
 
-                <p className="text-sm text-gray-600">
+                <div className="flex items-start justify-between gap-4">
+
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {item.label}
+                    </h3>
+
+                    <p className="mt-2 text-sm text-gray-700">
+                      {item.fullName}
+                    </p>
+                  </div>
+
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                    Saved
+                  </span>
+
+                </div>
+
+
+
+                <p className="mt-3 text-sm text-gray-600">
                   {item.address}
                 </p>
 
@@ -408,17 +544,34 @@ const Profile = () => {
                   Phone: {item.phone}
                 </p>
 
-                {/* Delete button */}
 
-                <button
-                  type="button"
-                  onClick={() => handleDeleteAddress(item._id)}
-                  className="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                  Delete
-                </button>
+
+                <div className="mt-4 flex gap-3">
+
+                  <button
+                    type="button"
+                    onClick={() => handleEditAddress(item)}
+                    className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                  >
+                    <FiEdit2 size={15} />
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleDeleteAddress(item._id)
+                    }
+                    className="flex items-center gap-2 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    <FiTrash2 size={15} />
+                    Delete
+                  </button>
+
+                </div>
               </div>
             ))}
+
           </div>
         )}
       </div>
