@@ -22,7 +22,7 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  // Today's Deals: discounted products first, capped to a row of 8
+
   const dealProducts = (
     products.some((product) => product.discount > 0)
       ? products.filter((product) => product.discount > 0)
@@ -61,7 +61,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Today's Deals */}
+  
       <section className="py-12">
 
         <div className="mb-6 flex items-center justify-between">
@@ -88,14 +88,13 @@ const Home = () => {
           </button>
         </div>
 
-        {/* Loading */}
         {loading && (
           <p className="py-10 text-center text-gray-500">
             Loading products...
           </p>
         )}
 
-        {/* Products */}
+
         {!loading && dealProducts.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {dealProducts.map((product) => (
@@ -107,7 +106,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* No Products */}
         {!loading && dealProducts.length === 0 && (
           <div className="rounded-xl border border-dashed border-gray-300 p-10 text-center text-gray-500">
             No products found.
@@ -116,7 +114,6 @@ const Home = () => {
 
       </section>
 
-      {/* Products For You */}
       <section className="border-t border-gray-100 py-12">
 
         <div className="mb-8 text-left">
@@ -129,14 +126,14 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Loading */}
+
         {loading && (
           <p className="py-10 text-center text-gray-500">
             Loading products...
           </p>
         )}
 
-        {/* Products */}
+  
         {!loading && products.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
@@ -148,7 +145,7 @@ const Home = () => {
           </div>
         )}
 
-        {/* No Products */}
+   
         {!loading && products.length === 0 && (
           <div className="rounded-xl border border-dashed border-gray-300 p-10 text-center text-gray-500">
             No products found.

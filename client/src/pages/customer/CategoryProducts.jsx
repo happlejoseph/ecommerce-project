@@ -76,7 +76,7 @@ const CategoryProducts = () => {
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
 
-      {/* Category Heading */}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
           {categoryTitle}
@@ -94,7 +94,7 @@ const CategoryProducts = () => {
           <ProductFilters filters={filters} onChange={setFilters} hideCategory />
         </div>
 
-        {/* Products */}
+    
         <div className="lg:col-span-3">
 
           {loading && <Loader />}
