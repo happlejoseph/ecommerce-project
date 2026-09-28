@@ -103,7 +103,7 @@ const VirtualTryOn = () => {
                   dx * dx + dy * dy
                 );
 
-                console.log('Hnad width:', distance);
+                const watchSize = distance * 400;
                 
 
                 hand.forEach((landmark, index)=> {
@@ -141,6 +141,9 @@ const VirtualTryOn = () => {
                   watchRef.current.style.display = "block";
                   watchRef.current.style.left = `${x}px`;
                   watchRef.current.style.top = `${y}px`;
+
+                  watchRef.current.style.width = `${watchSize}px`;
+                  watchRef.current.style.height = `${watchSize}px`;
                 }
                 }
             }
