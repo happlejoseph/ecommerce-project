@@ -137,7 +137,7 @@ const VirtualTryOn = ({watchImage}) => {
 
                 smoothAngleRef.current = smoothAngleRef.current + (angle - smoothAngleRef.current) * smoothAngleFactor;
 
-                const targetWatchSize = distance * 600;
+                const targetWatchSize = distance * 500;
 
                 const smoothSizeFactor = 0.15;
 
@@ -181,7 +181,7 @@ const VirtualTryOn = ({watchImage}) => {
 
                 if(watchRef.current) {
 
-                  const offsetPixels = smoothSizeRef.current * 0.40;
+                  const offsetPixels = smoothSizeRef.current * 0.32;
 
                   const offsetX = (dirX * offsetPixels) / video.clientWidth;
 
