@@ -69,7 +69,7 @@ const ProductDetails = () => {
 
   const tryOnImage = product?.image?.url?.replace(
     "/upload",
-    "/upload/e_background_removel"
+    "/upload/e_background_removal/"
   );
   console.log("Original image:", product?.image?.url);
   console.log("Try-on image:", tryOnImage);
