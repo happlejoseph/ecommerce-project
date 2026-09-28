@@ -71,6 +71,8 @@ const ProductDetails = () => {
     "/upload",
     "/upload/e_background_removel"
   );
+  console.log("Original image:", product?.image?.url);
+  console.log("Try-on image:", tryOnImage);
 
   const inWishlist = isInWishlist(product._id);
   const inCart = isInCart(product._id);
