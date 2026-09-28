@@ -128,7 +128,7 @@ const VirtualTryOn = () => {
                   if(watchAnchorRef.current) {
                   watchAnchorRef.current.style.display = "block";
                   watchAnchorRef.current.style.left = `${x}px`;
-                  watchAnchorRef.current.style.top = `${x}px`;
+                  watchAnchorRef.current.style.top = `${y}px`;
                 }
                 }
             }
