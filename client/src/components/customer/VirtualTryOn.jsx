@@ -106,6 +106,16 @@ const VirtualTryOn = () => {
                 const wristPoint = hand[0];
                 const middleBase = hand[9];
 
+                const handDirX = middleBase.x - wrist.x;
+                const handDirY = middleBase.y - wrist.y;
+
+                const dirLength = Math.sqrt(
+                  handDirX * handDirX + handDirY * handDirY
+                );
+
+                const dirX = handDirX / dirLength;
+                const dirY = handDirY / dirLength;
+
                 const angleDx = middleBase.x - wristPoint.x;
                 const angleDy = middleBase.y - wristPoint.y;
 
@@ -146,15 +156,26 @@ const VirtualTryOn = () => {
                 }
 
                 if(watchRef.current) {
+
+                  const offsetPixels = watchSize * 0.25;
+
+                  const offsetX = (dirX * offsetPixels) / video.clientWidth;
+
+                  const offsetY = (dirY * offsetPixels) / video.clientHeight;
+
+                  const watchX = (wrist.x - offsetX) * video.clientWidth;
+
+                  const watchY = (wrist.y - offsetY) * video.clientHeight;
+
                   watchRef.current.style.display = "block";
-                  watchRef.current.style.left = `${x}px`;
-                  watchRef.current.style.top = `${y}px`;
+                  watchRef.current.style.left = `${watchX}px`;
+                  watchRef.current.style.top = `${watchY}px`;
 
                   watchRef.current.style.width = `${watchSize}px`;
                   watchRef.current.style.height = `${watchSize}px`;
 
                   watchRef.current.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-                }
+              }                       
                 }
             }
         }
