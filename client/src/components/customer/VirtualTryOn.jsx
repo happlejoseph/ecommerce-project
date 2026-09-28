@@ -96,12 +96,20 @@ const VirtualTryOn = () => {
                 const point1 = hand[5];
                 const point2 = hand[17];
 
-                const dx = point2.x - point1.x;
-                const dy = point2.y - point1.y;
-
+                const widthDx = point2.x - point1.x;
+                const widthDy = point2.y - point1.y;
+                
                 const distance = Math.sqrt(
-                  dx * dx + dy * dy
+                  widthDx * widthDx + widthDy * widthDy
                 );
+
+                const wristPoint = hand[0];
+                const middleBase = hand[9];
+
+                const angleDx = middleBase.x - wristPoint.x;
+                const angleDy = middleBase.y - wristPoint.y;
+
+                const angle = Math.atan2(angleDy, angleDx) * (180 / Math.PI);
 
                 const watchSize = distance * 400;
                 
