@@ -124,12 +124,12 @@ const VirtualTryOn = () => {
                     wristMarkerRef.current.style.display = "block";
                     wristMarkerRef.current.style.left = `${x}px`;
                     wristMarkerRef.current.style.top = `${y}px`;
-                }
 
-                if(watchAnchorRef.current) {
+                  if(watchAnchorRef.current) {
                   watchAnchorRef.current.style.display = "block";
                   watchAnchorRef.current.style.left = `${x}px`;
                   watchAnchorRef.current.style.top = `${x}px`;
+                }
                 }
             }
         }
