@@ -260,7 +260,7 @@ return () => {
       className="w-full"
     />
 
-    {/* {Array.from({ length: 21 }).map((_, index) => (
+    {Array.from({ length: 21 }).map((_, index) => (
       <div
         key={index}
         ref={(element) => {
@@ -272,25 +272,25 @@ return () => {
           transform: "translate(-50%, -50%)",
         }}
       />
-  ))} */}
+  ))}
 
-    {/* <div
+    <div
       ref={wristMarkerRef}
       className="pointer-events-none absolute h-5 w-5 rounded-full bg-red-500"
       style={{
         display: "none",
         transform: "translate(-50%, -50%)",
       }}
-    /> */}
+    />
 
-    {/* <div
+    <div
       ref={watchAnchorRef}
       className="pointer-events-none absolute h-3 w-3 rounded-full bg-yellow-400"
       style={{
         display: "none",
         transform: "translate(-50%, -50%)",
       }}
-      /> */}
+      />
 
       <img
       ref={watchRef}
