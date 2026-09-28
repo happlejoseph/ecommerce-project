@@ -17,7 +17,7 @@ const VirtualTryOn = () => {
 
   const watchAnchorRef = useRef(null);
 
-  // const frameCountRef = useRef(0);
+  const watchRef = useRef(null);
 
   useEffect(() => {
     let stream;
@@ -74,13 +74,6 @@ const VirtualTryOn = () => {
     };
 
     const detectHand = ()=> {
-
-      // frameCountRef.current++;
-
-      // if(frameCountRef.current % 60 === 0) {
-      //   console.log('60 detection frames compilited');
-        
-      // }
 
         if(!videoRef.current || !handLandmarkerRef.current) {
 
@@ -143,6 +136,12 @@ const VirtualTryOn = () => {
                   watchAnchorRef.current.style.left = `${x}px`;
                   watchAnchorRef.current.style.top = `${y}px`;
                 }
+
+                if(watchRef.current) {
+                  watchRef.current.style.display = "block";
+                  watchRef.current.style.left = `${x}px`;
+                  watchRef.current.style.top = `${y}px`;
+                }
                 }
             }
         }
@@ -197,6 +196,7 @@ return () => {
         }}
       />
   ))}
+
     <div
       ref={wristMarkerRef}
       className="pointer-events-none absolute h-5 w-5 rounded-full bg-red-500"
@@ -209,6 +209,17 @@ return () => {
     <div
       ref={watchAnchorRef}
       className="pointer-events-none absolute h-3 w-3 rounded-full bg-yellow-400"
+      style={{
+        display: "none",
+        transform: "translate(-50%, -50%)",
+      }}
+      />
+
+      <img
+      ref={watchRef}
+      src="/ora-logo.png"
+      alt="watch"
+      className="pointer-events-none absolute h-20 w-20 object-contain"
       style={{
         display: "none",
         transform: "translate(-50%, -50%)",
