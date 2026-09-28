@@ -29,5 +29,6 @@ router.delete('/addresses/:addressId', auth, deleteAddress);
 
 router.get('/', auth, adminMiddleware, getAllUsers);
 
+router.put('/:userId/status', auth, adminMiddleware, updateUserStatus);
 
 export default router;

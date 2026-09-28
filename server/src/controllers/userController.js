@@ -147,7 +147,7 @@ export const forgotPassword = async(req, res)=> {
 
 
 
-// VERIFY RESET OTP //
+
 export const verifyResetOtp = async(req, res)=> {
 
     try {
@@ -271,7 +271,7 @@ export const getAddresses = async (req, res) => {
 };
 
 
-// ADD ADDRESS //
+
 export const addAddress = async (req, res) => {
     try {
 
@@ -385,7 +385,7 @@ export const getAddresses = async (req, res) => {
 };
 
 
-// ADD ADDRESS //
+
 export const addAddress = async (req, res) => {
     try {
 
@@ -434,7 +434,7 @@ export const addAddress = async (req, res) => {
 };
 
 
-// UPDATE ADDRESS //
+// UPDATE adress //
 export const updateAddress = async (req, res) => {
     try {
 
@@ -482,7 +482,7 @@ export const updateAddress = async (req, res) => {
 };
 
 
-// DELETE ADDRESS //
+// DELETE adress //
 export const deleteAddress = async (req, res) => {
     try {
 
@@ -516,6 +516,60 @@ export const deleteAddress = async (req, res) => {
     catch (error) {
 
         res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+
+// updata user state //
+export const updateUserStatus = async (req, res) => {
+
+    try {
+        const { status } = req.body;
+
+        if(!["active", "inactive"].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status"
+            });
+        }
+
+        const user = await User.findById(req.params.userId);
+
+        if(!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+
+        if(user._id.toString() === req.user.id.toString()) {
+            return res.status(400).json({
+                message: "You cannot change your own account status"
+            });
+        }
+
+        user.status = status;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: status === "inactive" ? "User deactivated successfully" : "User activated successfully",
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status
+            }
+        });
+    }
+    
+    catch (error) {
+        console.error("Update user status error:", error);
+
+        return res.status(500).json({
             message: error.message
         });
     }
