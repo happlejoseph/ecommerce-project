@@ -96,6 +96,9 @@ const VirtualTryOn = () => {
                 const point1 = hand[5];
                 const point2 = hand[17];
 
+                const anchorX = (point1.x - point2.x) / 2;
+                const anchorY = (point1.y + point2.y) / 2;
+
                 const widthDx = point2.x - point1.x;
                 const widthDy = point2.y - point1.y;
                 
@@ -135,6 +138,9 @@ const VirtualTryOn = () => {
                     const x = wrist.x * video.clientWidth;
                     const y = wrist.y * video.clientHeight;
 
+                    const watchX = anchorX * video.clientWidth;
+                    const watchY = anchorY * video.clientHeight;
+
                     wristMarkerRef.current.style.display = "block";
                     wristMarkerRef.current.style.left = `${x}px`;
                     wristMarkerRef.current.style.top = `${y}px`;
@@ -147,8 +153,8 @@ const VirtualTryOn = () => {
 
                 if(watchRef.current) {
                   watchRef.current.style.display = "block";
-                  watchRef.current.style.left = `${x}px`;
-                  watchRef.current.style.top = `${y}px`;
+                  watchRef.current.style.left = `${watchX}px`;
+                  watchRef.current.style.top = `${watchY}px`;
 
                   watchRef.current.style.width = `${watchSize}px`;
                   watchRef.current.style.height = `${watchSize}px`;
