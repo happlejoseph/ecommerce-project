@@ -15,6 +15,8 @@ const VirtualTryOn = () => {
 
   const landmarkRefs = useRef([]);
 
+  const watchAnchorRef = useRef(null);
+
   // const frameCountRef = useRef(0);
 
   useEffect(() => {
@@ -123,6 +125,12 @@ const VirtualTryOn = () => {
                     wristMarkerRef.current.style.left = `${x}px`;
                     wristMarkerRef.current.style.top = `${y}px`;
                 }
+
+                if(watchAnchorRef.current) {
+                  watchAnchorRef.current.style.display = "block";
+                  watchAnchorRef.current.style.left = `${x}px`;
+                  watchAnchorRef.current.style.top = `${x}px`;
+                }
             }
         }
 
@@ -184,7 +192,18 @@ return () => {
         transform: "translate(-50%, -50%)",
       }}
     />
+
+    <div
+      ref={watchAnchorRef}
+      className="pointer-events-none absolute h-3 w-3 rounded-full bg-yellow-400"
+      style={{
+        display: "none",
+        transform: "translate(-50%, -50%)",
+      }}
+      />
   </div>
+
+  
 );
 };
 
