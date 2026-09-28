@@ -151,20 +151,20 @@ const VirtualTryOn = ({watchImage}) => {
                 smoothSizeRef.current = smoothSizeRef.current + (targetWatchSize - smoothSizeRef.current) * smoothSizeFactor;
                 
 
-                hand.forEach((landmark, index)=> {
-                  const dot = landmarkRefs.current[index];
+                // hand.forEach((landmark, index)=> {
+                //   const dot = landmarkRefs.current[index];
 
-                  if(dot && videoRef.current) {
-                    const video = videoRef.current;
+                //   if(dot && videoRef.current) {
+                //     const video = videoRef.current;
 
-                    const x = landmark.x * video.clientWidth;
-                    const y = landmark.y * video.clientHeight;
+                //     const x = landmark.x * video.clientWidth;
+                //     const y = landmark.y * video.clientHeight;
 
-                    dot.style.display = 'block';
-                    dot.style.left = `${x}px`;
-                    dot.style.top = `${y}px`;
-                  }
-                });
+                //     dot.style.display = 'block';
+                //     dot.style.left = `${x}px`;
+                //     dot.style.top = `${y}px`;
+                //   }
+                // });
 
                 if(wristMarkerRef.current && videoRef.current) {
                     const video = videoRef.current;
@@ -172,15 +172,15 @@ const VirtualTryOn = ({watchImage}) => {
                     const x = wrist.x * video.clientWidth;
                     const y = wrist.y * video.clientHeight;
 
-                    wristMarkerRef.current.style.display = "block";
-                    wristMarkerRef.current.style.left = `${x}px`;
-                    wristMarkerRef.current.style.top = `${y}px`;
+                    // wristMarkerRef.current.style.display = "block";
+                    // wristMarkerRef.current.style.left = `${x}px`;
+                    // wristMarkerRef.current.style.top = `${y}px`;
 
-                  if(watchAnchorRef.current) {
-                  watchAnchorRef.current.style.display = "block";
-                  watchAnchorRef.current.style.left = `${x}px`;
-                  watchAnchorRef.current.style.top = `${y}px`;
-                }
+                //   if(watchAnchorRef.current) {
+                //   watchAnchorRef.current.style.display = "block";
+                //   watchAnchorRef.current.style.left = `${x}px`;
+                //   watchAnchorRef.current.style.top = `${y}px`;
+                // }
 
                 if(watchRef.current) {
 
