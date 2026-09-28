@@ -243,3 +243,283 @@ export const resetPassword = async(req, res)=> {
 
 
 
+// GET ADDRESSES //
+export const getAddresses = async (req, res) => {
+    try {
+
+        const user = await User.findById(req.user.id)
+            .select('addresses');
+
+        if(!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            addresses: user.addresses
+        });
+
+    }
+    
+    catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+// ADD ADDRESS //
+export const addAddress = async (req, res) => {
+    try {
+
+        const {label, fullName, phone, address, city, state, pincode} = req.body;
+
+        if (!label || !fullName || !phone || !address || !city || !state || !pincode) {
+            return res.status(400).json({
+                message: 'All address fields are required'
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if(!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        user.addresses.push({label, fullName, phone, address, city, state, pincode});
+
+        await user.save();
+
+        res.status(201).json({
+            message: 'Address added successfully',
+            addresses: user.addresses
+        });
+
+    }
+    
+    catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+// UPDATE ADDRESS //
+export const updateAddress = async (req, res) => {
+    try {
+
+        const {label, fullName, phone, address, city, state, pincode} = req.body;
+
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        const addressItem = user.addresses.id(req.params.addressId);
+
+        if (!addressItem) {
+            return res.status(404).json({
+                message: 'Address not found'
+            });
+        }
+
+        addressItem.label = label;
+        addressItem.fullName = fullName;
+        addressItem.phone = phone;
+        addressItem.address = address;
+        addressItem.city = city;
+        addressItem.state = state;
+        addressItem.pincode = pincode;
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Address updated successfully',
+            addresses: user.addresses
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+
+
+// GET ADDRESSES //
+export const getAddresses = async (req, res) => {
+    try {
+
+        const user = await User.findById(req.user.id)
+            .select('addresses');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            addresses: user.addresses
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+// ADD ADDRESS //
+export const addAddress = async (req, res) => {
+    try {
+
+        const {
+            label,
+            fullName,
+            phone,
+            address,
+            city,
+            state,
+            pincode
+        } = req.body;
+
+        if (!label || !fullName || !phone || !address || !city || !state || !pincode) {
+
+            return res.status(400).json({
+                message: 'All address fields are required'
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+
+        if(!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        user.addresses.push({label, fullName, phone, address, city, state, pincode});
+
+        await user.save();
+
+        res.status(201).json({
+            message: 'Address added successfully',
+            addresses: user.addresses
+        });
+
+    }
+    
+    catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+// UPDATE ADDRESS //
+export const updateAddress = async (req, res) => {
+    try {
+
+        const {label, fullName, phone, address, city, state, pincode} = req.body;
+
+        const user = await User.findById(req.user.id);
+
+        if(!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        const addressItem = user.addresses.id(req.params.addressId);
+
+        if(!addressItem) {
+            return res.status(404).json({
+                message: 'Address not found'
+            });
+        }
+
+        addressItem.label = label;
+        addressItem.fullName = fullName;
+        addressItem.phone = phone;
+        addressItem.address = address;
+        addressItem.city = city;
+        addressItem.state = state;
+        addressItem.pincode = pincode;
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Address updated successfully',
+            addresses: user.addresses
+        });
+
+    }
+    
+    catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+// DELETE ADDRESS //
+export const deleteAddress = async (req, res) => {
+    try {
+
+        const user = await User.findById(req.user.id);
+
+        if(!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        const addressItem = user.addresses.id(req.params.addressId);
+
+        if(!addressItem) {
+            return res.status(404).json({
+                message: 'Address not found'
+            });
+        }
+
+        addressItem.deleteOne();
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Address deleted successfully',
+            addresses: user.addresses
+        });
+
+    }
+    
+    catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+

@@ -29,13 +29,59 @@ const userSchema = new mongoose.Schema({
         default: 'customer'
     },
 
+    addresses: [
+        {
+            label: {
+                type: String,
+                required: true,
+                trim: true
+            },
+
+            fullName: {
+                type: String,
+                required: true,
+                trim: true
+            },
+
+            phone: {
+                type: Number,
+                required: true
+            },
+
+            address: {
+                type: String,
+                required: true,
+                trim: true
+            },
+
+            city: {
+                type: String,
+                required: true,
+                trim: true
+            },
+
+            state: {
+                type: String,
+                required: true,
+                trim: true
+            },
+
+            pincode: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
+
     resetPasswordOTP: {
         type: String,
     },
 
     resetPasswordOTPExpiry: {
         type: Date
-    }
+    },
+
+    
 
 
 }, {timestamps: true});

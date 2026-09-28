@@ -1,4 +1,6 @@
-import { useState } from "react";
+
+
+import { useEffect, useState } from "react";
 import { FiMail, FiUser } from "react-icons/fi";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -11,9 +13,24 @@ const Profile = () => {
     email: user?.email || "",
   });
 
+  const [addresses, setAddresses] = useState([]);
+  const [addressLoading, setAddressLoading] = useState(false);
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
+  const [addressForm, setAddressForm] = useState({
+  label: "",
+  fullName: "",
+  phone: "",
+  address: "",
+  city: "",
+  state: "",
+  pincode: "",
+});
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -23,6 +40,59 @@ const Profile = () => {
       [name]: value,
     }));
   };
+
+  const handleAddressChange = (event) => {
+  const { name, value } = event.target;
+
+    setAddressForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handleAddressSubmit = async (event) => {
+  event.preventDefault();
+
+  try {
+    const response = await api.post("/user/addresses", addressForm);
+
+    setAddresses(response.data.addresses);
+
+    setAddressForm({
+      label: "",
+      fullName: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+    });
+
+    setShowAddressForm(false);
+  } catch (error) {
+    console.error(
+      "Failed to add address:",
+      error.response?.data?.message || error.message
+    );
+  }
+};
+
+  useEffect(() => {
+  const fetchAddresses = async () => {
+    setAddressLoading(true);
+
+    try {
+      const response = await api.get("/user/addresses");
+      setAddresses(response.data.addresses);
+    } catch (error) {
+      console.error("Failed to fetch addresses:", error);
+    } finally {
+      setAddressLoading(false);
+    }
+  };
+
+  fetchAddresses();
+}, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -119,6 +189,176 @@ const Profile = () => {
           {loading ? "Saving..." : "Save Changes"}
         </button>
       </form>
+
+      <div className="mt-8">
+  <h2 className="text-xl font-semibold">My Addresses</h2>
+  <p className="mt-1 text-sm text-gray-500">
+    Manage your saved delivery addresses.
+  </p>
+
+   <button
+    type="button"
+    onClick={() => setShowAddressForm(!showAddressForm)}
+    className="mt-4 rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+  >
+    {showAddressForm ? "Cancel" : "Add New Address"}
+  </button>
+
+  {showAddressForm && (
+  <form
+    onSubmit={handleAddressSubmit}
+    className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-5"
+  >
+    <h3 className="text-lg font-semibold">Add New Address</h3>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        Address Label
+      </label>
+
+      <input
+        name="label"
+        value={addressForm.label}
+        onChange={handleAddressChange}
+        placeholder="Home, Work, etc."
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        Full Name
+      </label>
+
+      <input
+        name="fullName"
+        value={addressForm.fullName}
+        onChange={handleAddressChange}
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        Phone
+      </label>
+
+      <input
+        name="phone"
+        type="tel"
+        value={addressForm.phone}
+        onChange={handleAddressChange}
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        Address
+      </label>
+
+      <textarea
+        name="address"
+        value={addressForm.address}
+        onChange={handleAddressChange}
+        required
+        rows="3"
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        City
+      </label>
+
+      <input
+        name="city"
+        value={addressForm.city}
+        onChange={handleAddressChange}
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        State
+      </label>
+
+      <input
+        name="state"
+        value={addressForm.state}
+        onChange={handleAddressChange}
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <div className="mt-4">
+      <label className="mb-2 block text-sm font-medium">
+        Pincode
+      </label>
+
+      <input
+        name="pincode"
+        type="text"
+        value={addressForm.pincode}
+        onChange={handleAddressChange}
+        required
+        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+      />
+    </div>
+
+    <button
+      type="submit"
+      className="mt-5 w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+    >
+      Save Address
+    </button>
+  </form>
+)}
+
+  {addressLoading ? (
+    <p className="mt-5 text-sm text-gray-500">
+      Loading addresses...
+    </p>
+  ) : addresses.length === 0 ? (
+    <p className="mt-5 rounded-lg border border-gray-200 p-5 text-sm text-gray-500">
+      No saved addresses yet.
+    </p>
+  ) : (
+    <div className="mt-5 space-y-4">
+      {addresses.map((item) => (
+        <div
+          key={item._id}
+          className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+        >
+          <h3 className="font-semibold">{item.label}</h3>
+
+          <p className="mt-2 text-sm text-gray-700">
+            {item.fullName}
+          </p>
+
+          <p className="text-sm text-gray-600">
+            {item.address}
+          </p>
+
+          <p className="text-sm text-gray-600">
+            {item.city}, {item.state} - {item.pincode}
+          </p>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Phone: {item.phone}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
     </div>
   );
 };
