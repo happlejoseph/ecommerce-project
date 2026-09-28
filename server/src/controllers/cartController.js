@@ -158,7 +158,7 @@ export const updateCart = async(req, res)=> {
             });
         }
 
-        // find product inside cart
+        // find product inside cart //
         const itemIndex = cart.items.findIndex(item=> item.product.toString() === productId);
 
         if(itemIndex === -1) {
@@ -192,6 +192,8 @@ export const updateCart = async(req, res)=> {
         }
 
         await cart.save();
+
+        await cart.populate('items.product');
 
         res.status(200).json({
             message: numericQuantity <= 0 ? 'Product removed from cart' : 'Cart updated successfully',
