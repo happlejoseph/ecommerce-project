@@ -100,6 +100,19 @@ const VirtualTryOn = () => {
 
                 const wrist = hand[0];
 
+                const point1 = hand[5];
+                const point2 = hand[17];
+
+                const dx = point2.x - point1.x;
+                const dy = point2.y - point1.y;
+
+                const distance = Math.sqrt(
+                  dx * dx + dy * dy
+                );
+
+                console.log('Hnad width:', distance);
+                
+
                 hand.forEach((landmark, index)=> {
                   const dot = landmarkRefs.current[index];
 
