@@ -137,7 +137,7 @@ const VirtualTryOn = ({watchImage}) => {
 
                 smoothAngleRef.current = smoothAngleRef.current + (angle - smoothAngleRef.current) * smoothAngleFactor;
 
-                const targetWatchSize = distance * 400;
+                const targetWatchSize = distance * 600;
 
                 const smoothSizeFactor = 0.15;
 
