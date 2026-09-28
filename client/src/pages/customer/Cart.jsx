@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import Loader from "../../components/common/Loader";
 
 const Cart = () => {
+  
   const navigate = useNavigate();
   const { items, loading, subtotal, updateCartItem, removeFromCart } =
     useCart();

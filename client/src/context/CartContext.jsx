@@ -48,6 +48,9 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (productId, quantity = 1) => {
     const response = await api.post("/cart/add", { productId, quantity });
+    
+    console.log("UPDATED CART RESPONSE:", response.data);
+
     setCart(response.data.cart);
     await fetchCart();
   };
