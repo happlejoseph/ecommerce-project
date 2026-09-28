@@ -67,6 +67,11 @@ const ProductDetails = () => {
     );
   }
 
+  const tryOnImage = product?.image?.url?.replace(
+    "/upload",
+    "/upload/e_background_removel"
+  );
+
   const inWishlist = isInWishlist(product._id);
   const inCart = isInCart(product._id);
   const outOfStock = product.stock <= 0;
@@ -382,7 +387,7 @@ const ProductDetails = () => {
           
           {showTryOn && (
             <div className="mt-4">
-              <VirtualTryOn watchImage={product.image.url}/>
+              <VirtualTryOn watchImage={tryOnImage}/>
             </div>
           )}
         </div>

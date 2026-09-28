@@ -181,7 +181,7 @@ const VirtualTryOn = ({watchImage}) => {
 
                 if(watchRef.current) {
 
-                  const offsetPixels = smoothSizeRef.current * 0.25;
+                  const offsetPixels = smoothSizeRef.current * 0.40;
 
                   const offsetX = (dirX * offsetPixels) / video.clientWidth;
 
