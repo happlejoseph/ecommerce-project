@@ -382,7 +382,7 @@ const ProductDetails = () => {
           
           {showTryOn && (
             <div className="mt-4">
-              <VirtualTryOn/>
+              <VirtualTryOn watchImage={product.image.url}/>
             </div>
           )}
         </div>

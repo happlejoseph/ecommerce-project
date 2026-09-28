@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { FilesetResolver, HandLandmarker, } from "@mediapipe/tasks-vision";
 
-const VirtualTryOn = () => {
+const VirtualTryOn = ({watchImage}) => {
 
   const videoRef = useRef(null);
 
@@ -286,7 +286,7 @@ return () => {
 
       <img
       ref={watchRef}
-      src="/ora-logo.png"
+      src={watchImage}
       alt="watch"
       className="pointer-events-none absolute h-20 w-20 object-contain"
       style={{
