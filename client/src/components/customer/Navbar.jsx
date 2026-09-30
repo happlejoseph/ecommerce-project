@@ -1,16 +1,7 @@
 
 
 import { useEffect, useRef, useState } from "react";
-import {
-  FiSearch,
-  FiUser,
-  FiShoppingCart,
-  FiPackage,
-  FiHeart,
-  FiLogOut,
-  FiChevronDown,
-  FiSettings,
-} from "react-icons/fi";
+import {FiSearch, FiUser, FiShoppingCart, FiPackage, FiHeart, FiLogOut, FiChevronDown, FiSettings,} from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -33,7 +24,9 @@ const Navbar = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSearchSubmit = (event) => {
@@ -51,16 +44,26 @@ const Navbar = () => {
   };
 
   return (
-    <header className="w-full border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-20 max-w-7xl items-center gap-6 px-6">
 
         {/* Logo */}
-        <div className="shrink-0 cursor-pointer" onClick={() => navigate("/")}>
-          <img src="/ora-logo.png" alt="ORA" className="h-10 w-auto"/>
+        <div
+          className="shrink-0 cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          <img
+            src="/ora-logo.png"
+            alt="ORA"
+            className="h-10 w-auto"
+          />
         </div>
 
         {/* Search */}
-        <form onSubmit={handleSearchSubmit} className="flex flex-1">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex flex-1"
+        >
           <div className="relative w-full">
             <input
               type="text"
@@ -87,7 +90,9 @@ const Navbar = () => {
             className="hidden items-center gap-2 text-sm font-medium transition hover:opacity-60 md:flex"
           >
             <FiHeart size={21} />
-            <span className="hidden lg:block">Wishlist</span>
+            <span className="hidden lg:block">
+              Wishlist
+            </span>
           </button>
         )}
 
@@ -98,7 +103,9 @@ const Navbar = () => {
             className="hidden items-center gap-2 text-sm font-medium transition hover:opacity-60 md:flex"
           >
             <FiPackage size={21} />
-            <span className="hidden lg:block">Orders</span>
+            <span className="hidden lg:block">
+              Orders
+            </span>
           </button>
         )}
 
@@ -106,13 +113,17 @@ const Navbar = () => {
         {!isAdmin && (
           <button
             onClick={() =>
-              isAuthenticated ? navigate("/cart") : navigate("/login")
+              isAuthenticated
+                ? navigate("/cart")
+                : navigate("/login")
             }
             className="relative flex items-center gap-2 text-sm font-medium transition hover:opacity-60"
           >
             <FiShoppingCart size={22} />
 
-            <span className="hidden lg:block">Cart</span>
+            <span className="hidden lg:block">
+              Cart
+            </span>
 
             {itemCount > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-black text-xs text-white">
@@ -124,18 +135,32 @@ const Navbar = () => {
 
         {/* Auth Area */}
         {isAuthenticated ? (
-          <div className="relative" ref={menuRef}>
+          <div
+            className="relative"
+            ref={menuRef}
+          >
             <button
-              onClick={() => setMenuOpen((previous) => !previous)}
+              onClick={() =>
+                setMenuOpen((previous) => !previous)
+              }
               className="flex items-center gap-2 text-sm font-medium transition hover:opacity-60"
             >
               <FiUser size={21} />
-              <span className="hidden lg:block">{user?.name?.split(" ")[0]}</span>
-              <FiChevronDown size={16} className="hidden lg:block" />
+
+              <span className="hidden lg:block">
+                {user?.name?.split(" ")[0]}
+              </span>
+
+              <FiChevronDown
+                size={16}
+                className="hidden lg:block"
+              />
             </button>
 
             {menuOpen && (
               <div className="absolute right-0 top-12 z-20 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-lg">
+
+                {/* Admin */}
                 {isAdmin && (
                   <button
                     onClick={() => {
@@ -149,6 +174,7 @@ const Navbar = () => {
                   </button>
                 )}
 
+                {/* Customer */}
                 {!isAdmin && (
                   <>
                     <button
@@ -186,6 +212,7 @@ const Navbar = () => {
                   </>
                 )}
 
+                {/* Logout */}
                 <button
                   onClick={handleLogout}
                   className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
@@ -193,6 +220,7 @@ const Navbar = () => {
                   <FiLogOut size={16} />
                   Logout
                 </button>
+
               </div>
             )}
           </div>
@@ -202,7 +230,10 @@ const Navbar = () => {
             className="flex items-center gap-2 text-sm font-medium transition hover:opacity-60"
           >
             <FiUser size={21} />
-            <span className="hidden lg:block">Login</span>
+
+            <span className="hidden lg:block">
+              Login
+            </span>
           </button>
         )}
 
