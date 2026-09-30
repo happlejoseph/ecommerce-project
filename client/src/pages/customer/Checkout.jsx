@@ -24,6 +24,7 @@ const Checkout = () => {
     useState("cod");
 
   const [formData, setFormData] = useState({
+    label: "Home",
     fullName: "",
     phone: "",
     address: "",
@@ -35,12 +36,9 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Orders above ₹10,000 must use online payment
+ 
   const isOnlineRequired = subtotal > 10000;
 
-  /*
-   * Load Razorpay Checkout script
-   */
   useEffect(() => {
     const existingScript = document.querySelector(
       'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
@@ -60,24 +58,18 @@ const Checkout = () => {
     document.body.appendChild(script);
 
     return () => {
-      // We don't remove the script because other checkout
-      // attempts may need it during the same session.
+     
     };
   }, []);
 
-  /*
-   * Automatically select online payment
-   * when total is above ₹10,000.
-   */
+ 
   useEffect(() => {
     if (isOnlineRequired) {
       setPaymentMethod("online");
     }
   }, [isOnlineRequired]);
 
-  /*
-   * Fetch saved addresses
-   */
+
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -98,6 +90,8 @@ const Checkout = () => {
           );
 
           setFormData({
+            label:
+              firstAddress.label || "Home",
             fullName:
               firstAddress.fullName || "",
             phone:
@@ -125,9 +119,7 @@ const Checkout = () => {
     fetchAddresses();
   }, []);
 
-  /*
-   * Handle address form changes
-   */
+ 
   const handleChange = (event) => {
     const {
       name,
@@ -139,18 +131,16 @@ const Checkout = () => {
       [name]: value,
     }));
 
-    // If user manually changes the address,
-    // it is no longer the selected saved address.
     setSelectedAddressId("");
   };
 
-  /*
-   * Select a saved address
-   */
+ 
   const handleSelectAddress = (address) => {
     setSelectedAddressId(address._id);
 
     setFormData({
+      label:
+        address.label || "Home",
       fullName:
         address.fullName || "",
       phone:
@@ -168,13 +158,12 @@ const Checkout = () => {
     setError("");
   };
 
-  /*
-   * Use a new address
-   */
+ 
   const handleAddNewAddress = () => {
     setSelectedAddressId("");
 
     setFormData({
+      label: "Home",
       fullName: "",
       phone: "",
       address: "",
@@ -186,9 +175,60 @@ const Checkout = () => {
     setError("");
   };
 
-  /*
-   * Create COD order
-   */
+  
+  const saveNewAddress = async () => {
+    if (selectedAddressId) {
+      return;
+    }
+
+    try {
+      const response = await api.post(
+        "/user/addresses",
+        {
+          label:
+            formData.label || "Home",
+
+          fullName:
+            formData.fullName,
+
+          phone:
+            Number(formData.phone),
+
+          address:
+            formData.address,
+
+          city:
+            formData.city,
+
+          state:
+            formData.state,
+
+          pincode:
+            Number(formData.pincode),
+        }
+      );
+
+ 
+      if (response.data.address) {
+        setAddresses((previous) => [
+          ...previous,
+          response.data.address,
+        ]);
+      }
+
+      return true;
+    } catch (error) {
+  
+      console.error(
+        "Failed to save new address:",
+        error
+      );
+
+      return false;
+    }
+  };
+
+  
   const createCodOrder = async () => {
     const response = await api.post(
       "/orders",
@@ -206,9 +246,7 @@ const Checkout = () => {
     return response.data.order;
   };
 
-  /*
-   * Start Razorpay payment
-   */
+  
   const startOnlinePayment = async () => {
     if (!window.Razorpay) {
       throw new Error(
@@ -216,17 +254,16 @@ const Checkout = () => {
       );
     }
 
-    /*
-     * Ask our backend to create
-     * a Razorpay payment order.
-     */
+  
     const response = await api.post(
       "/payment/create"
     );
 
-    const razorpayOrder = response.data.order;
+    const razorpayOrder =
+      response.data.order;
 
-    const razorpayKey = response.data.key;
+    const razorpayKey =
+      response.data.key;
 
     if (!razorpayOrder?.id) {
       throw new Error(
@@ -240,76 +277,97 @@ const Checkout = () => {
       );
     }
 
-    /*
-     * Razorpay Checkout configuration
-     */
+    
     const options = {
       key: razorpayKey,
 
-      amount: razorpayOrder.amount,
+      amount:
+        razorpayOrder.amount,
 
-      currency: razorpayOrder.currency,
+      currency:
+        razorpayOrder.currency,
 
       name: "ORA",
 
       description:
         "Luxury Watch Purchase",
 
-      order_id: razorpayOrder.id,
+      order_id:
+        razorpayOrder.id,
 
       prefill: {
-        name: formData.fullName,
-        contact: formData.phone,
+        name:
+          formData.fullName,
+
+        contact:
+          formData.phone,
       },
 
       notes: {
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
+        address:
+          formData.address,
+
+        city:
+          formData.city,
+
+        state:
+          formData.state,
+
+        pincode:
+          formData.pincode,
       },
 
       theme: {
         color: "#000000",
       },
 
-      /*
-       * Called when payment is successful.
-       */
+    
       handler: async (paymentResponse) => {
         try {
           setError("");
           setLoading(true);
 
-          /*
-           * Send Razorpay payment information
-           * to our backend.
-           */
-          const verifyResponse = await api.post(
-            "/payment/verify",
-            {
-              razorpay_order_id:
-                paymentResponse.razorpay_order_id,
+         
+          const verifyResponse =
+            await api.post(
+              "/payment/verify",
+              {
+                razorpay_order_id:
+                  paymentResponse.razorpay_order_id,
 
-              razorpay_payment_id:
-                paymentResponse.razorpay_payment_id,
+                razorpay_payment_id:
+                  paymentResponse.razorpay_payment_id,
 
-              razorpay_signature:
-                paymentResponse.razorpay_signature,
+                razorpay_signature:
+                  paymentResponse.razorpay_signature,
 
-              shippingAddress: {
-                ...formData,
-                phone: Number(formData.phone),
-                pincode: Number(formData.pincode),
-              },
-            }
-          );
+                shippingAddress: {
+                  ...formData,
 
-          /*
-           * Payment verified and ORA order created.
-           */
+                  phone:
+                    Number(formData.phone),
+
+                  pincode:
+                    Number(formData.pincode),
+                },
+              }
+            );
+
+        
+          const addressSaved =
+            await saveNewAddress();
+
+      
+          if (!addressSaved && !selectedAddressId) {
+            console.warn(
+              "Order succeeded, but the new address could not be saved."
+            );
+          }
+
+       
           clearCartLocally();
 
+        
           navigate(
             `/orders/${verifyResponse.data.order._id}`,
             {
@@ -333,10 +391,7 @@ const Checkout = () => {
         }
       },
 
-      /*
-       * Called when customer closes the
-       * Razorpay payment window.
-       */
+      
       modal: {
         ondismiss: () => {
           setLoading(false);
@@ -348,15 +403,11 @@ const Checkout = () => {
       },
     };
 
-    /*
-     * Create Razorpay Checkout instance.
-     */
+  
     const razorpayCheckout =
       new window.Razorpay(options);
 
-    /*
-     * Handle payment failure.
-     */
+  
     razorpayCheckout.on(
       "payment.failed",
       (response) => {
@@ -374,15 +425,11 @@ const Checkout = () => {
       }
     );
 
-    /*
-     * Open Razorpay payment modal.
-     */
+
     razorpayCheckout.open();
   };
 
-  /*
-   * Main checkout submit
-   */
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -390,10 +437,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      /*
-       * Safety check:
-       * Orders above ₹10,000 cannot use COD.
-       */
+    
       if (
         subtotal > 10000 &&
         paymentMethod === "cod"
@@ -405,14 +449,28 @@ const Checkout = () => {
         );
       }
 
-      /*
-       * COD
-       */
+  
       if (paymentMethod === "cod") {
-        const order = await createCodOrder();
+        const order =
+          await createCodOrder();
 
+    
+        const addressSaved =
+          await saveNewAddress();
+
+        if (
+          !addressSaved &&
+          !selectedAddressId
+        ) {
+          console.warn(
+            "Order succeeded, but the new address could not be saved."
+          );
+        }
+
+      
         clearCartLocally();
 
+    
         navigate(
           `/orders/${order._id}`,
           {
@@ -425,16 +483,11 @@ const Checkout = () => {
         return;
       }
 
-      /*
-       * Online payment
-       */
+   
       if (paymentMethod === "online") {
         await startOnlinePayment();
 
-        /*
-         * Do not set loading to false here.
-         * Razorpay modal is now open.
-         */
+      
         return;
       }
     } catch (error) {
@@ -448,9 +501,6 @@ const Checkout = () => {
     }
   };
 
-  /*
-   * Empty cart
-   */
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-6 py-24 text-center">
@@ -477,12 +527,13 @@ const Checkout = () => {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
 
-        {/* LEFT SIDE */}
+    
+
         <form
           onSubmit={handleSubmit}
           className="space-y-4 rounded-xl border border-gray-200 p-6 lg:col-span-2"
         >
-          {/* DELIVERY ADDRESS */}
+    
 
           <h2 className="text-lg font-bold">
             Delivery Address
@@ -588,7 +639,7 @@ const Checkout = () => {
             </div>
           )}
 
-          {/* ADDRESS FORM */}
+    
 
           <div className="pt-4">
 
@@ -597,6 +648,37 @@ const Checkout = () => {
                 ? "Selected Delivery Address"
                 : "Enter Delivery Address"}
             </h3>
+
+    
+
+            {!selectedAddressId && (
+              <div className="mb-4">
+                <label className="mb-2 block text-sm font-medium">
+                  Address Label
+                </label>
+
+                <select
+                  name="label"
+                  value={formData.label}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-black"
+                >
+                  <option value="Home">
+                    Home
+                  </option>
+
+                  <option value="Work">
+                    Work
+                  </option>
+
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+            )}
+
 
             <div>
               <label className="mb-2 block text-sm font-medium">
@@ -614,6 +696,8 @@ const Checkout = () => {
               />
             </div>
 
+
+
             <div className="mt-4">
               <label className="mb-2 block text-sm font-medium">
                 Phone
@@ -622,12 +706,16 @@ const Checkout = () => {
               <input
                 name="phone"
                 type="tel"
-                value={formData.phone}
+                value={
+                  formData.phone
+                }
                 onChange={handleChange}
                 required
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
+
+
 
             <div className="mt-4">
               <label className="mb-2 block text-sm font-medium">
@@ -646,6 +734,7 @@ const Checkout = () => {
               />
             </div>
 
+
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
 
               <div>
@@ -655,8 +744,12 @@ const Checkout = () => {
 
                 <input
                   name="city"
-                  value={formData.city}
-                  onChange={handleChange}
+                  value={
+                    formData.city
+                  }
+                  onChange={
+                    handleChange
+                  }
                   required
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
                 />
@@ -669,14 +762,20 @@ const Checkout = () => {
 
                 <input
                   name="state"
-                  value={formData.state}
-                  onChange={handleChange}
+                  value={
+                    formData.state
+                  }
+                  onChange={
+                    handleChange
+                  }
                   required
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
                 />
               </div>
 
             </div>
+
+            {/* PINCODE */}
 
             <div className="mt-4">
               <label className="mb-2 block text-sm font-medium">
@@ -688,7 +787,9 @@ const Checkout = () => {
                 value={
                   formData.pincode
                 }
-                onChange={handleChange}
+                onChange={
+                  handleChange
+                }
                 required
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
