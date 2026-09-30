@@ -43,7 +43,6 @@ export const updateOrderStatus = async(req, res)=> {
             });
         }
 
-        // only log + change status if it actually changed
         if(status && status !== order.status) {
             order.status = status;
             order.statusHistory.push({ status });
@@ -95,8 +94,7 @@ export const updateReturnStatus = async(req, res)=> {
             });
         }
 
-        // 'refunded' can only follow an already-approved return.
-        // 'approved' / 'rejected' can only follow a pending request.
+       
         if(returnStatus === 'refunded' && order.returnStatus !== 'approved') {
             return res.status(400).json({
                 message: 'Return must be approved before it can be marked as refunded'
@@ -109,7 +107,7 @@ export const updateReturnStatus = async(req, res)=> {
             });
         }
 
-        // restock items only when a return is actually approved
+        
         if(returnStatus === 'approved') {
             for(const item of order.items) {
                 await Product.findByIdAndUpdate(
