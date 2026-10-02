@@ -78,14 +78,26 @@ export const createPaymentOrder = async (req, res) => {
     }
 };
 
+
+
+
+
 export const verifyPayment = async (req, res) => {
 
     try {
+        
         const {razorpay_order_id, razorpay_payment_id, razorpay_signature, shippingAddress} = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return res.status(400).json({
                 message: "Payment verification data is missing"
+            });
+        }
+
+
+        if(!shippingAddress || !shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+            return res.status(400).json({
+                message: 'Complete shipping address is required'
             });
         }
 
@@ -123,10 +135,10 @@ export const verifyPayment = async (req, res) => {
 
         const orderItems = [];
 
+        let totalAmount = 0;
+
         for(const item of cart.items) {
-            const product = await Product.findById(
-                item.product
-            );
+            const product = await Product.findById(item.product);
 
             if(!product) {
                 return res.status(404).json({
@@ -141,6 +153,8 @@ export const verifyPayment = async (req, res) => {
             }
 
             const price = product.discount > 0 ? Math.round(product.price * (1 - product.discount / 100)): product.price;
+
+            totalAmount += price * item.quantity;
 
             orderItems.push({
                 product: product._id,

@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
 
           <div>
-            <h2 className="text-xl font-bold">E-COM</h2>
+            <h2 className="text-xl font-bold">ORA</h2>
             <p className="mt-3 text-sm text-gray-500">
               Great deals. Better choices. Shop the best products at the
               best prices.
@@ -55,7 +55,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} E-COM. All rights reserved.
+          © {new Date().getFullYear()} ORA. All rights reserved.
         </div>
       </div>
     </footer>

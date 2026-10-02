@@ -15,12 +15,10 @@ const orderSchema = new mongoose.Schema({
         {
             name: {
                 type: String,
-                // required: true
             },
 
             image: {
                 type: String,
-                // required: true
             },
 
             product: {
@@ -93,11 +91,11 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     },
 
-    rezorpayOrderId: {
+    razorpayOrderId: {
         type: String
     },
 
-    rezopayPaymentId: {
+    razorpayPaymentId: {
         type: String
     },
 
