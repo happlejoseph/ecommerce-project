@@ -10,12 +10,18 @@ export const addProduct = async(req, res)=> {
 
     try{
 
-        const {name, description, price, discount, stock, category, movement, caseMaterial, strapMaterial, waterResistance, warranty} = req.body;
+        const {name, description, price, discount, stock, category, movement, caseMaterial, strapMaterial, waterResistance, warranty,} = req.body;
 
-        if(!name || !description || !price || !stock || !category) {
+        if(!name || !description || price === undefined || stock === undefined || !category || !movement || !caseMaterial || !strapMaterial || !waterResistance || !warranty) {
             return res.status(400).json({
                 message: 'Required fields are missing'
             });
+        }
+
+        if(Number(price) < 0 || Number(stock) < 0 || Number(discount ?? 0) < 0 || Number(discount ?? 0) > 100) {
+            return res.status(400).json({
+                message: 'Invalid price, stock, or discount value'
+            })
         }
 
         if(!req.file) {
@@ -55,6 +61,8 @@ export const addProduct = async(req, res)=> {
         });
     }
 }
+
+
 
 
 
@@ -159,6 +167,8 @@ export const getProductById = async(req, res)=> {
 
 
 
+
+
 export const updateProduct = async(req, res)=> {
 
     try {
@@ -174,7 +184,6 @@ export const updateProduct = async(req, res)=> {
         }
 
         if(req.file) {
-            await cloudinary.uploader.destroy(product.image.public_id);
 
             const result = await cloudinary.uploader.upload(
                 `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
@@ -187,6 +196,10 @@ export const updateProduct = async(req, res)=> {
                 url: result.secure_url,
                 public_id: result.public_id
             };
+
+            if(product.image?.public_id) {
+                await cloudinary.uploader.destroy(product.image.public_id)
+            }
         }
 
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -214,6 +227,8 @@ export const updateProduct = async(req, res)=> {
 
 
 
+
+
 export const deleteProduct = async(req, res)=> {
 
     try {
@@ -231,7 +246,7 @@ export const deleteProduct = async(req, res)=> {
         await Product.findByIdAndDelete(id);
 
         await Review.deleteMany({
-            product: req.params.id
+            product: id
         })
 
         if(product.image?.public_id) {
