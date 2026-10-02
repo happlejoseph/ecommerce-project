@@ -1,3 +1,5 @@
+
+
 import Navbar from "../components/customer/Navbar";
 import CategoryNav from "../components/customer/CategoryNav";
 import Footer from "../components/customer/Footer";
