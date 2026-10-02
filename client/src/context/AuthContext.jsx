@@ -1,75 +1,125 @@
+
+
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
+
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
 
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-    }
+    const [user, setUser] = useState(null);
 
-    setLoading(false);
-  }, []);
+    const [loading, setLoading] = useState(true);
 
-  const login = async (email, password) => {
-    const response = await api.post("/auth/login", { email, password });
 
-    const { token, user: loggedInUser } = response.data;
+    useEffect(() => {
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(loggedInUser));
+        const storedUser = localStorage.getItem("user");
+        const storedToken = localStorage.getItem("token");
 
-    setUser(loggedInUser);
+        if (storedUser && storedToken) {
 
-    return loggedInUser;
-  };
+            const userData = JSON.parse(storedUser);
 
-  const register = async (name, email, password) => {
-    const response = await api.post("/auth/register", {
-      name,
-      email,
-      password,
-    });
+            setUser(userData);
+        }
 
-    return response.data;
-  };
+        setLoading(false);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-  };
+    }, []);
 
-  const updateStoredUser = (updatedUser) => {
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-  };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === "admin",
-        login,
-        register,
-        logout,
-        updateStoredUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+    // Login //
+    const login = async (email, password) => {
+
+        const response = await api.post("/auth/login", {
+            email: email,
+            password: password
+        });
+
+
+        const token = response.data.token;
+        const loggedInUser = response.data.user;
+
+
+        localStorage.setItem("token", token); 
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(loggedInUser)
+        );
+
+
+        setUser(loggedInUser);
+
+
+        return loggedInUser;
+    };
+
+
+    // Register //
+    const register = async (name, email, password) => {
+
+        const response = await api.post("/auth/register", {
+            name: name,
+            email: email,
+            password: password
+        });
+
+        return response.data;
+    };
+
+
+    // Logout //
+    const logout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        setUser(null);
+    };
+
+    const updateStoredUser = (updatedUser) => {
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(updatedUser)
+        );
+
+        setUser(updatedUser);
+    };
+
+
+    return (
+
+        <AuthContext.Provider
+            value={{
+                user: user,
+                loading: loading,
+
+                isAuthenticated: user !== null,
+
+                isAdmin: user?.role === "admin",
+
+                login: login,
+                register: register,
+                logout: logout,
+                updateStoredUser: updateStoredUser
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
-export const useAuth = () => useContext(AuthContext);
+
+export const useAuth = () => {
+
+    return useContext(AuthContext);
+};
+
 
 export default AuthContext;
