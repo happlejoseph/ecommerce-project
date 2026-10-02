@@ -90,7 +90,7 @@ export const updateReturnStatus = async(req, res)=> {
 
         const { returnStatus } = req.body;
 
-        const allowedStatuses = ['approved', 'rejected', 'refunded'];
+        const allowedStatuses = ['approved', 'rejected',];
 
         if(!allowedStatuses.includes(returnStatus)) {
             return res.status(400).json({
@@ -106,14 +106,8 @@ export const updateReturnStatus = async(req, res)=> {
             });
         }
 
-       
-        if(returnStatus === 'refunded' && order.returnStatus !== 'approved') {
-            return res.status(400).json({
-                message: 'Return must be approved before it can be marked as refunded'
-            });
-        }
-
-        if(returnStatus !== 'refunded' && order.returnStatus !== 'requested') {
+        
+        if(order.returnStatus !== 'requested') {
             return res.status(400).json({
                 message: 'This order has no pending return request'
             });
