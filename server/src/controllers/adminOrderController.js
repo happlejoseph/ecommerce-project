@@ -4,7 +4,7 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 
 
-// GET ALL ORDERS (ADMIN) //
+// GET ALL ORDERS //
 export const getAllOrders = async(req, res)=> {
 
     try {
@@ -28,12 +28,22 @@ export const getAllOrders = async(req, res)=> {
 
 
 
-// UPDATE ORDER STATUS (ADMIN) //
+
+
+// UPDATE order stat //
 export const updateOrderStatus = async(req, res)=> {
 
     try {
 
         const {status, trackingNumber, courier, estimatedDelivery} = req.body;
+
+        const allowedStatuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
+
+        if(status && !allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                message: 'Invalid order status'
+            });
+        }
 
         const order = await Order.findById(req.params.id);
 
@@ -71,7 +81,9 @@ export const updateOrderStatus = async(req, res)=> {
 
 
 
-// UPDATE RETURN STATUS (ADMIN) //
+
+
+// UPDATE RETUrn status //
 export const updateReturnStatus = async(req, res)=> {
 
     try {
@@ -105,20 +117,6 @@ export const updateReturnStatus = async(req, res)=> {
             return res.status(400).json({
                 message: 'This order has no pending return request'
             });
-        }
-
-        
-        if(returnStatus === 'approved') {
-            for(const item of order.items) {
-                await Product.findByIdAndUpdate(
-                    item.product,
-                    {
-                        $inc: {
-                            stock: item.quantity
-                        }
-                    }
-                );
-            }
         }
 
         order.returnStatus = returnStatus;

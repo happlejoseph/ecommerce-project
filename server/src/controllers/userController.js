@@ -275,6 +275,9 @@ export const getAddresses = async (req, res) => {
 
 
 
+
+
+
 export const addAddress = async (req, res) => {
 
     try {
@@ -314,6 +317,9 @@ export const addAddress = async (req, res) => {
         });
     }
 };
+
+
+
 
 
 // UPDATE adress //
@@ -365,6 +371,9 @@ export const updateAddress = async (req, res) => {
 };
 
 
+
+
+
 // DELETE adress //
 export const deleteAddress = async (req, res) => {
 
@@ -404,6 +413,9 @@ export const deleteAddress = async (req, res) => {
         });
     }
 };
+
+
+
 
 
 
