@@ -20,7 +20,17 @@ export const registerUser = async(req, res)=> {
             });
         }
 
-        const existingUser = await User.findOne({email});
+        const normalizedEmail = email.toLowerCase().trim();
+
+        if(password.length < 6) {
+            return res.status(400).json({
+                message: 'Password must be at least 6 characters'
+            });
+        }
+
+        const existingUser = await User.findOne({
+            email: normalizedEmail
+        });
 
         if(existingUser) {
             return res.status(400).json({
@@ -31,15 +41,21 @@ export const registerUser = async(req, res)=> {
         const hashPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-            name, email, password:hashPassword,
+            name, email: normalizedEmail, password: hashPassword
         });
 
         res.status(201).json({
             message: 'User registered successfully',
-            user
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     }
+
     catch(error) {
 
         res.status(500).json({
@@ -47,6 +63,8 @@ export const registerUser = async(req, res)=> {
         });
     }
 }
+
+
 
 
 // LOGIN //
@@ -62,11 +80,21 @@ export const loginUser = async(req, res)=> {
             });
         }
 
-        const user = await User.findOne({email});
+        const normalizedEmail = email.toLowerCase().trim();
+
+        const user = await User.findOne({
+            email: normalizedEmail
+        });
 
         if(!user) {
             return res.status(404).json({
                 message: 'User not found'
+            });
+        }
+
+        if(user.status === 'inactive') {
+            return res.status(403).json({
+                message: 'Your account has been deactivated'
             });
         }
 
@@ -78,6 +106,13 @@ export const loginUser = async(req, res)=> {
             return res.status(401).json({
                 message: 'Invalid password'
             });
+        }
+
+        
+        if(!process.env.JWT_SECRET) {
+            return res.status(500).json({
+                message: 'JWT secret is not configured'
+            })
         }
 
         const token = jwt.sign(
@@ -102,6 +137,7 @@ export const loginUser = async(req, res)=> {
         });
 
     }
+
     catch(error) {
 
         res.status(500).json({

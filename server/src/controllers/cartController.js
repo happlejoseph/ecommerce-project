@@ -102,7 +102,9 @@ export const addToCart = async(req, res)=> {
 
 
 
-// GET CART //
+
+
+// GET CAR //
 export const getCart = async(req, res)=> {
 
     try {
@@ -122,6 +124,7 @@ export const getCart = async(req, res)=> {
         });
 
     }
+
     catch(error) {
 
         res.status(500).json({
@@ -133,7 +136,9 @@ export const getCart = async(req, res)=> {
 
 
 
-// UPDATE CART //
+
+
+// update cart /
 export const updateCart = async(req, res)=> {
 
     try {
@@ -158,7 +163,6 @@ export const updateCart = async(req, res)=> {
             });
         }
 
-        // find product inside cart //
         const itemIndex = cart.items.findIndex(item=> item.product.toString() === productId);
 
         if(itemIndex === -1) {
@@ -187,7 +191,6 @@ export const updateCart = async(req, res)=> {
                 });
             }
 
-            // update quantity
             cart.items[itemIndex].quantity = numericQuantity;
         }
 
@@ -201,6 +204,7 @@ export const updateCart = async(req, res)=> {
         });
         
     }
+
     catch(error) {
 
         res.status(500).json({
