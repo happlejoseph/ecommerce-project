@@ -12,9 +12,9 @@ export const createOrder = async (req, res) => {
         
         const {shippingAddress, paymentMethod} = req.body;
 
-        if(!shippingAddress) {
+        if(!shippingAddress || !shippingAddress.fullName || !shippingAddress.address || !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
             return res.status(400).json({
-                message: "Shipping address is required"
+                message: 'Complete shipping address is required'
             });
         }
 
@@ -88,9 +88,9 @@ export const createOrder = async (req, res) => {
         }
 
 
-        if(totalAmount > 10000) {
+        if(totalAmount > 50000) {
             return res.status(400).json({
-                message: "Cash on Delivery is not available for orders above ₹10,000. Please use online payment."
+                message: "Cash on Delivery is not available for orders above ₹50,000. Please use online payment."
             });
         }
 
@@ -145,6 +145,12 @@ export const createOrder = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
 export const getMyOrder = async (req, res) => {
 
     try {
@@ -167,6 +173,12 @@ export const getMyOrder = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+
 
 export const getOrderById = async (req, res) => {
 
@@ -194,9 +206,17 @@ export const getOrderById = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
+
 export const cancelOrder = async (req, res) => {
     
     try {
+
         const order = await Order.findOne({
             _id: req.params.id,
             user: req.user.id
@@ -209,10 +229,7 @@ export const cancelOrder = async (req, res) => {
         }
 
         if (
-            order.status === "shipping" ||
-            order.status === "delivered" ||
-            order.status === "cancelled"
-        ) {
+            order.status === "shipping" || order.status === "delivered" || order.status === "cancelled") {
             return res.status(400).json({
                 message: "Order cannot be cancelled"
             });
@@ -250,6 +267,11 @@ export const cancelOrder = async (req, res) => {
         });
     }
 };
+
+
+
+
+
 
 export const requestReturn = async (req, res) => {
 
