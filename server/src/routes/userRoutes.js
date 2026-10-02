@@ -2,7 +2,7 @@
 
 import express from "express";
 
-import { addAddress, deleteAddress, forgotPassword, getAddresses, getAllUsers, getProfile, resetPassword, updateAddress, updateProfile, verifyResetOtp } from "../controllers/userController.js";
+import { addAddress, deleteAddress, forgotPassword, getAddresses, getAllUsers, getProfile, resetPassword, updateAddress, updateProfile, updateUserStatus, verifyResetOtp } from "../controllers/userController.js";
 import { auth } from "../middleware/authMiddleware.js";
 import { adminMiddleware } from "../middleware/adminMiddleware.js";
 

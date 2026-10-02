@@ -21,7 +21,8 @@ export const addReview = async(req, res)=> {
         }
 
         const order = await Order.findOne({
-            user: req.user._id, status: 'delivered', 'items.product': product
+            user: req.user.id,
+            status: 'delivered', 'items.product': product
         });
 
         if(!order) {
@@ -31,7 +32,7 @@ export const addReview = async(req, res)=> {
         }
 
         const existingReview = await Review.findOne({
-            user: req.user._id, product: product
+            user: req.user.id, product: product
         });
 
         if(existingReview) {
@@ -41,7 +42,7 @@ export const addReview = async(req, res)=> {
         }
 
         const review = await Review.create({
-            user: req.user._id, product: product, rating: rating, comment: comment
+            user: req.user.id, product: product, rating: rating, comment: comment
         });
 
         const reviews = await Review.find({
@@ -57,7 +58,7 @@ export const addReview = async(req, res)=> {
         const averageRating = totalRating / reviews.length;
 
         existingProduct.averageRating = averageRating;
-        existingReview.numReviews = reviews.length;
+        existingProduct.numReviews = reviews.length;
 
         await existingProduct.save();
 
@@ -76,9 +77,36 @@ export const addReview = async(req, res)=> {
 
 
 
+// get all review //
+export const getProductReviews = async(req, res)=> {
+
+    try {
+
+        const reviews = await Review.find({
+            product: req.params.productId
+        })
+        .populate('user', 'name')
+        .sort({createdAt: -1});
+
+        res.status(200).json({
+            reviews: reviews
+        })
+    }
+
+    catch(error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+
+
 
 export const deleteReview = async (req, res) => {
+
     try {
+
         const review = await Review.findById(req.params.id);
 
         if (!review) {
@@ -87,13 +115,34 @@ export const deleteReview = async (req, res) => {
             });
         }
 
-        if (review.user.toString() !== req.user._id.toString()) {
+        if (review.user.toString() !== req.user.id.toString()) {
             return res.status(403).json({
                 message: "You can delete only your own review"
             });
         }
 
         await review.deleteOne();
+
+        const reviews = await Review.find({
+            product: review.product
+        });
+
+        let totalRating = 0
+
+        for(const review of reviews) {
+            totalRating = totalRating + review.rating
+        }
+
+        const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0
+
+        const product = await Product.findById(review.product)
+
+        if(product) {
+            product.averageRating = averageRating
+            product.numReviews = reviews.length
+
+            await product.save();
+        }
 
         res.status(200).json({
             message: "Review deleted successfully"
