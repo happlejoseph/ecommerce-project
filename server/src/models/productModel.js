@@ -13,23 +13,27 @@ const productSchema = new mongoose.Schema({
 
     description: {
         type: String,
-        required: true
+        required: true,
     },
 
     price: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
 
     discount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0,
+        max: 100
     },
 
     stock: {
         type: Number,
         required: true,
-        default: 0
+        default: 0,
+        min: 0
     },
 
     image: {
@@ -80,12 +84,14 @@ const productSchema = new mongoose.Schema({
     },
 
     averageRating: {
-        type: String,
-        default: 0
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
     },
 
-    numReview: {
-        type: String,
+    numReviews: {
+        type: Number,
         default: 0
     }
     
