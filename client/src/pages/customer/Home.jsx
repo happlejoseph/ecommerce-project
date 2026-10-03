@@ -33,32 +33,21 @@ const Home = () => {
     <div className="mx-auto max-w-7xl px-6">
 
       {/* Banner */}
-      <section className="mt-6 rounded-2xl bg-black px-8 py-16 text-white md:px-16">
-        <div className="max-w-2xl">
-          <p className="text-sm font-medium uppercase tracking-widest text-gray-300">
-            Limited Time Offer
-          </p>
+      <section className="relative mt-6 overflow-hidden rounded-2xl">
+        <img
+        src="https://res.cloudinary.com/eneepkso/image/upload/v1791007628/rolex-gmt-limited-offer.png"
+        alt="Rolex GMT-Master II Limited Time Offer"
+        className="h-auto w-full object-cover"
+        />
 
-          <h1 className="mt-3 text-4xl font-bold leading-tight md:text-6xl">
-            Great Deals.
-            <br />
-            Better Choices.
-          </h1>
-
-          <p className="mt-5 max-w-lg text-gray-300">
-            Discover amazing products at special prices.
-            Shop your favorites before the offer ends.
-          </p>
-
-          <button
-            onClick={() =>
-              window.scrollTo({ top: 800, behavior: "smooth" })
-            }
-            className="mt-8 rounded-lg bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-gray-200"
-          >
-            Shop Now
-          </button>
-        </div>
+        <button
+        onClick={()=> window.scrollTo({
+          top: 800, behavior: "smooth"
+        })}
+        className="absolute bottom-8 right-8 rounded-lg bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-gray-200"
+        >
+          Shop Now
+        </button>
       </section>
 
   
