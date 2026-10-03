@@ -13,11 +13,11 @@ export const addToCart = async(req, res)=> {
 
         const {productId, quantity} = req.body;
 
-        const requestedQty = Number(quantity) || 1;
+        const requestedQty = Number(quantity);
 
-        if(requestedQty < 1) {
+        if(!Number.isInteger(requestedQty) || requestedQty < 1) {
             return res.status(400).json({
-                message: 'Quantity must be at least 1'
+                message: 'Quantity must be a positive whole number'
             });
         }
 
@@ -115,7 +115,9 @@ export const getCart = async(req, res)=> {
 
         if(!cart) {
             return res.status(404).json({
-                message: 'Cart not found'
+                cart: {
+                    item: []
+                }
             });
         }
 
@@ -147,9 +149,9 @@ export const updateCart = async(req, res)=> {
 
         const numericQuantity = Number(quantity);
 
-        if(Number.isNaN(numericQuantity)) {
+        if(Number.isInteger(numericQuantity)) {
             return res.status(400).json({
-                message: 'Quantity must be a number'
+                message: 'Quantity must be a whole number'
             });
         }
 
