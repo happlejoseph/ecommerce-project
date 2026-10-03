@@ -292,7 +292,7 @@ export const addAddress = async (req, res) => {
         }
 
         const phoneNumber = String(phone);
-        const pincode = String(pincode);
+        const pincodeNumber = String(pincode);
 
         if(!/^\d{10}$/.test(phoneNumber)) {
           return res.status(400).json({
@@ -351,7 +351,7 @@ export const updateAddress = async (req, res) => {
         }
 
         const phoneNumber = String(phone);
-        const pincode = String(pincode);
+        const pincodeNumber = String(pincode);
 
         if(!/^\d{10}$/.test(phoneNumber)) {
           return res.status(400).json({
