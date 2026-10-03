@@ -32,7 +32,7 @@ const Home = () => {
   return (
     <div className="mx-auto max-w-7xl px-6">
 
-      {/* Hero Banner */}
+      {/* Banner */}
       <section className="mt-6 rounded-2xl bg-black px-8 py-16 text-white md:px-16">
         <div className="max-w-2xl">
           <p className="text-sm font-medium uppercase tracking-widest text-gray-300">

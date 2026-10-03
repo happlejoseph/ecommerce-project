@@ -381,28 +381,22 @@ const Checkout = () => {
 
       prefill: {
 
-        name:
-          formData.fullName,
+        name: formData.fullName,
 
-        contact:
-          formData.phone,
+        contact: formData.phone,
 
       },
 
 
       notes: {
 
-        address:
-          formData.address,
+        address: formData.address,
 
-        city:
-          formData.city,
+        city: formData.city,
 
-        state:
-          formData.state,
+        state: formData.state,
 
-        pincode:
-          formData.pincode,
+        pincode: formData.pincode,
 
       },
 

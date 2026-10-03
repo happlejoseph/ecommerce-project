@@ -291,6 +291,21 @@ export const addAddress = async (req, res) => {
             });
         }
 
+        const phoneNumber = String(phone);
+        const pincode = String(pincode);
+
+        if(!/^\d{10}$/.test(phoneNumber)) {
+          return res.status(400).json({
+            message: 'Phone number must contain exactly 10 digits'
+          });
+        }
+
+        if(!/^\d{6}&/.test(pincode)) {
+          return res.status(400).json({
+            message: 'Pincode must contain exactly 6 digits'
+          });
+        }
+
         const user = await User.findById(req.user.id);
 
         if(!user) {
@@ -374,7 +389,7 @@ export const updateAddress = async (req, res) => {
 
 
 
-// DELETE adress //
+// delet adress //
 export const deleteAddress = async (req, res) => {
 
     try {
