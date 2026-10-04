@@ -15,19 +15,26 @@ export const AuthProvider = ({ children }) => {
 
 
     useEffect(() => {
-
         const storedUser = localStorage.getItem("user");
-        const storedToken = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-        if (storedUser && storedToken) {
+        if (storedUser && token) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
 
-            const userData = JSON.parse(storedUser);
+                setUser(parsedUser);
+            }
+            catch (error) {
+                console.error("Invalid user data in localStorage");
 
-            setUser(userData);
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+
+                setUser(null);
+            }
         }
 
         setLoading(false);
-
     }, []);
 
 
