@@ -808,7 +808,7 @@ const Checkout = () => {
 
                 <label className="mb-2 block text-sm font-medium">
 
-                  Address Label
+                  Address
 
                 </label>
 
