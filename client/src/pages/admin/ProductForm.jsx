@@ -33,7 +33,7 @@ const ProductForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch categories
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -47,7 +47,7 @@ const ProductForm = () => {
     fetchCategories();
   }, []);
 
-  // Fetch product when editing
+
   useEffect(() => {
     if (!isEdit) return;
 
@@ -82,7 +82,7 @@ const ProductForm = () => {
     fetchProduct();
   }, [id, isEdit]);
 
-  // Handle input changes
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -92,7 +92,7 @@ const ProductForm = () => {
     }));
   };
 
-  // Handle image selection
+ 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
 
@@ -102,7 +102,7 @@ const ProductForm = () => {
     }
   };
 
-  // Submit product
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -119,24 +119,23 @@ const ProductForm = () => {
       payload.append("stock", formData.stock);
       payload.append("category", formData.category);
 
-      // Watch details
+     
       payload.append("movement", formData.movement);
       payload.append("caseMaterial", formData.caseMaterial);
       payload.append("strapMaterial", formData.strapMaterial);
       payload.append("waterResistance", formData.waterResistance);
       payload.append("warranty", formData.warranty);
 
-      // Image
+    
       if (imageFile) {
         payload.append("image", imageFile);
       }
 
-      // Update product
+     
       if (isEdit) {
         await api.put(`/products/${id}`, payload);
       }
 
-      // Add product
       else {
         if (!imageFile) {
           setError("Please select a product image.");
@@ -171,7 +170,7 @@ const ProductForm = () => {
         onSubmit={handleSubmit}
         className="mt-6 space-y-5 rounded-xl border border-gray-200 bg-white p-6"
       >
-        {/* Product Image */}
+      
         <div>
           <label className="mb-2 block text-sm font-medium">
             Product Image
@@ -207,7 +206,7 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Name */}
+   
         <div>
           <label className="mb-2 block text-sm font-medium">
             Name
@@ -222,7 +221,7 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Description */}
+      
         <div>
           <label className="mb-2 block text-sm font-medium">
             Description
@@ -238,7 +237,7 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Price / Discount / Stock */}
+   
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="mb-2 block text-sm font-medium">
@@ -289,7 +288,7 @@ const ProductForm = () => {
           </div>
         </div>
 
-        {/* Category */}
+      
         <div>
           <label className="mb-2 block text-sm font-medium">
             Category
@@ -317,13 +316,12 @@ const ProductForm = () => {
           </select>
         </div>
 
-        {/* Watch Details */}
+
         <div className="border-t border-gray-200 pt-5">
           <h2 className="mb-4 text-lg font-semibold">
             Watch Details
           </h2>
 
-          {/* Movement + Case Material */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-2 block text-sm font-medium">
@@ -334,7 +332,7 @@ const ProductForm = () => {
                 name="movement"
                 value={formData.movement}
                 onChange={handleChange}
-                // placeholder="e.g. Automatic"
+     
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -348,13 +346,13 @@ const ProductForm = () => {
                 name="caseMaterial"
                 value={formData.caseMaterial}
                 onChange={handleChange}
-                // placeholder="e.g. Stainless Steel"
+     
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
           </div>
 
-          {/* Strap Material + Water Resistance */}
+
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
               <label className="mb-2 block text-sm font-medium">
@@ -365,7 +363,7 @@ const ProductForm = () => {
                 name="strapMaterial"
                 value={formData.strapMaterial}
                 onChange={handleChange}
-                // placeholder="e.g. Leather"
+ 
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
@@ -379,13 +377,13 @@ const ProductForm = () => {
                 name="waterResistance"
                 value={formData.waterResistance}
                 onChange={handleChange}
-                // placeholder="e.g. 100m"
+               
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
               />
             </div>
           </div>
 
-          {/* Warranty */}
+       
           <div className="mt-4">
             <label className="mb-2 block text-sm font-medium">
               Warranty
@@ -395,20 +393,19 @@ const ProductForm = () => {
               name="warranty"
               value={formData.warranty}
               onChange={handleChange}
-              // placeholder="e.g. 5 Years"
+            
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
             />
           </div>
         </div>
 
-        {/* Error */}
+        
         {error && (
           <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {/* Buttons */}
         <div className="flex gap-3">
           <button
             type="submit"
