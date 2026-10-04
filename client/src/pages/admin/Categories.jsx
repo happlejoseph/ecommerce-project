@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
 import api from "../../services/api";
@@ -19,7 +21,6 @@ const Categories = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // GET ALL CATEGORIES
   const fetchCategories = async () => {
     setLoading(true);
 
@@ -29,6 +30,11 @@ const Categories = () => {
       setCategories(response.data.categories || []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
+
+      setError(
+        error.response?.data?.message ||
+          "Failed to load categories."
+      );
     } finally {
       setLoading(false);
     }
@@ -38,15 +44,13 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  // OPEN ADD FORM
   const openAddForm = () => {
     setEditingId(null);
-    setFormData(emptyForm);
+    setFormData({ ...emptyForm });
     setError("");
     setShowForm(true);
   };
 
-  // OPEN EDIT FORM
   const openEditForm = (category) => {
     setEditingId(category._id);
 
@@ -61,7 +65,6 @@ const Categories = () => {
     setShowForm(true);
   };
 
-  // HANDLE INPUT CHANGES
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
 
@@ -71,7 +74,6 @@ const Categories = () => {
     }));
   };
 
-  // ADD / UPDATE CATEGORY
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -83,7 +85,7 @@ const Categories = () => {
         name: formData.name,
         description: formData.description,
         image: formData.image,
-        status: formData.status,
+        status: Boolean(formData.status),
       };
 
       if (editingId) {
@@ -93,8 +95,10 @@ const Categories = () => {
       }
 
       setShowForm(false);
-      fetchCategories();
+      setFormData({ ...emptyForm });
+      setEditingId(null);
 
+      await fetchCategories();
     } catch (error) {
       console.error("Category save error:", error);
 
@@ -102,15 +106,15 @@ const Categories = () => {
         error.response?.data?.message ||
           "Failed to save category."
       );
-
     } finally {
       setSubmitting(false);
     }
   };
 
-  // DELETE CATEGORY
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this category?")) return;
+    if (!window.confirm("Delete this category?")) {
+      return;
+    }
 
     try {
       await api.delete(`/categories/${id}`);
@@ -118,7 +122,6 @@ const Categories = () => {
       setCategories((previous) =>
         previous.filter((category) => category._id !== id)
       );
-
     } catch (error) {
       alert(
         error.response?.data?.message ||
@@ -127,14 +130,12 @@ const Categories = () => {
     }
   };
 
-  // LOADING
   if (loading) {
     return <Loader label="Loading categories..." />;
   }
 
   return (
     <div>
-      {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
@@ -155,7 +156,6 @@ const Categories = () => {
         </button>
       </div>
 
-      {/* CATEGORY CARDS */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {categories.map((category) => (
           <div
@@ -186,7 +186,6 @@ const Categories = () => {
               </span>
             </div>
 
-            {/* ACTION BUTTONS */}
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => openEditForm(category)}
@@ -197,9 +196,7 @@ const Categories = () => {
               </button>
 
               <button
-                onClick={() =>
-                  handleDelete(category._id)
-                }
+                onClick={() => handleDelete(category._id)}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
               >
                 <FiTrash2 size={13} />
@@ -210,19 +207,15 @@ const Categories = () => {
         ))}
       </div>
 
-      {/* NO CATEGORIES */}
       {categories.length === 0 && (
         <p className="mt-10 text-center text-sm text-gray-500">
           No categories yet. Add your first category.
         </p>
       )}
 
-      {/* MODAL */}
       {showForm && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-6">
           <div className="w-full max-w-md rounded-2xl bg-white p-6">
-
-            {/* MODAL HEADER */}
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-bold">
                 {editingId
@@ -231,19 +224,21 @@ const Categories = () => {
               </h2>
 
               <button
-                onClick={() => setShowForm(false)}
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setError("");
+                }}
                 className="text-gray-400 hover:text-black"
               >
                 <FiX size={20} />
               </button>
             </div>
 
-            {/* FORM */}
             <form
               onSubmit={handleSubmit}
               className="space-y-4"
             >
-              {/* NAME */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Name
@@ -258,7 +253,6 @@ const Categories = () => {
                 />
               </div>
 
-              {/* DESCRIPTION */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Description
@@ -273,7 +267,6 @@ const Categories = () => {
                 />
               </div>
 
-              {/* IMAGE URL */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Image URL
@@ -288,7 +281,6 @@ const Categories = () => {
                 />
               </div>
 
-              {/* STATUS */}
               {editingId && (
                 <label className="flex items-center gap-2 text-sm font-medium">
                   <input
@@ -302,14 +294,12 @@ const Categories = () => {
                 </label>
               )}
 
-              {/* ERROR */}
               {error && (
                 <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
                   {error}
                 </div>
               )}
 
-              {/* SUBMIT */}
               <button
                 type="submit"
                 disabled={submitting}
