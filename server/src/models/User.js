@@ -33,7 +33,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["active", "inactive"],
         default: "active"
-},
+    },
+
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    emailVerificationOTP: {
+        type: String
+    },
+
+    emailVerificationOTPExpiry: {
+        type: Date
+    },
 
     addresses: [
         {
