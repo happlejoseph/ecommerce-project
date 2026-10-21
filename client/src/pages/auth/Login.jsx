@@ -40,8 +40,10 @@ const Login = () => {
       } else {
         navigate(redirectTo || "/");
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error("Login failed:", error);
+      onsole.log("Backend response:", error.response?.data);
 
       setError(
         error.response?.data?.message ||

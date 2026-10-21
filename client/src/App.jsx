@@ -29,6 +29,7 @@ import Profile from "./pages/customer/Profile";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyOTP from "./pages/auth/VerifyOTP";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -40,6 +41,7 @@ import AdminOrderDetails from "./pages/admin/OrderDetails";
 import AdminUsers from "./pages/admin/Users";
 
 const App = () => {
+
   return (
     <BrowserRouter>
       <ToastProvider>
@@ -139,6 +141,7 @@ const App = () => {
                       <Route path="/" element={<Home />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
+                      <Route path="/verify-otp" element={<VerifyOTP />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/category/:category" element={<CategoryProducts />} />
                       <Route path="/product/:id" element={<ProductDetails />} />

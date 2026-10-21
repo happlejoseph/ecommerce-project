@@ -39,7 +39,7 @@ const Register = () => {
 
       console.log("Register response:", response.data);
 
-      setSuccess("Account created successfully!");
+      setSuccess("Registration successful! Please check your email for the OTP.");
 
       setFormData({
         name: "",
@@ -48,7 +48,9 @@ const Register = () => {
       });
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/verify-otp", {
+          state: {email: response.data.email || formData.email}
+        })
       }, 1000);
 
     } catch (error) {
