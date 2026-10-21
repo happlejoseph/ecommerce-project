@@ -30,6 +30,7 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import VerifyOTP from "./pages/auth/VerifyOTP";
+import VerifyLoginOTP from "./pages/auth/VerifyLoginOTP";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -142,6 +143,7 @@ const App = () => {
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
                       <Route path="/verify-otp" element={<VerifyOTP />} />
+                      <Route path="/verify-login-otp" element={<VerifyLoginOTP />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/category/:category" element={<CategoryProducts />} />
                       <Route path="/product/:id" element={<ProductDetails />} />

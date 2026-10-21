@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema({
         type: Date
     },
 
+    loginOTP: {
+        type: String
+    },
+
+    loginOTPExpiry: {
+        type: Date
+    },
+
     addresses: [
         {
             label: {

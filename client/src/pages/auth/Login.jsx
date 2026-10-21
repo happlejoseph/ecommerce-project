@@ -1,11 +1,12 @@
+
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,23 +32,24 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const loggedInUser = await login(formData.email, formData.password);
+      const response = await api.post("/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-      const redirectTo = location.state?.from?.pathname;
-
-      if (loggedInUser.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate(redirectTo || "/");
-      }
-    }
-    catch (error) {
+      navigate("/verify-login-otp", {
+        state: {
+          email: response.data.email || formData.email,
+          from: location.state?.from,
+        },
+      });
+    } catch (error) {
       console.error("Login failed:", error);
-      onsole.log("Backend response:", error.response?.data);
+      console.log("Backend response:", error.response?.data);
 
       setError(
         error.response?.data?.message ||
-        "Login failed. Please check your credentials."
+          "Login failed. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -56,27 +58,19 @@ const Login = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-140px)] items-center justify-center px-6 py-12">
-
       <div className="w-full max-w-md">
-
-        {/* Heading */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">
-            Welcome Back
-          </h1>
+          <h1 className="text-3xl font-bold">Welcome Back</h1>
 
           <p className="mt-2 text-sm text-gray-500">
             Login to your account to continue shopping.
           </p>
         </div>
 
-        {/* Form */}
         <form
           onSubmit={handleSubmit}
           className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
         >
-
-          {/* Email */}
           <div className="mb-5">
             <label
               htmlFor="email"
@@ -97,7 +91,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="mb-3">
             <label
               htmlFor="password"
@@ -127,23 +120,20 @@ const Login = () => {
             </Link>
           </div>
 
-          {/* Error */}
           {error && (
             <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
               {error}
             </div>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
             className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Sending OTP..." : "Login"}
           </button>
 
-          {/* Register Link */}
           <p className="mt-6 text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Link
@@ -153,11 +143,8 @@ const Login = () => {
               Create Account
             </Link>
           </p>
-
         </form>
-
       </div>
-
     </div>
   );
 };
