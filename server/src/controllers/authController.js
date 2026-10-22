@@ -92,7 +92,7 @@ export const registerUser = async(req, res)=> {
 
         res.status(201).json({
             message: 'Registration successful. Please check your email for the verification OTP.',
-                email: user.email
+                email: user.email, otp
         });
 
     }
