@@ -51,7 +51,7 @@ const Register = () => {
         navigate("/verify-otp", {
           state: {email: response.data.email || formData.email}
         })
-      }, 1000);
+      }, 5000);
 
     } catch (error) {
       console.error("Registration failed:", error);
