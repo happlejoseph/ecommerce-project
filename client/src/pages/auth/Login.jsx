@@ -3,150 +3,171 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { completeLogin } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+    const handleChange = (event) => {
+        const { name, value } = event.target;
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
+        setFormData((previous) => ({
+            ...previous,
+            [name]: value,
+        }));
+    };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-    setError("");
-    setLoading(true);
+        setError("");
+        setLoading(true);
 
-    try {
-      const response = await api.post("/auth/login", {
-        email: formData.email,
-        password: formData.password,
-      });
+        try {
+            const response = await api.post("/auth/login", {
+                email: formData.email,
+                password: formData.password,
+            });
 
-      navigate("/verify-login-otp", {
-        state: {
-          email: response.data.email || formData.email,
-          from: location.state?.from,
-        },
-      });
-    } catch (error) {
-      console.error("Login failed:", error);
-      console.log("Backend response:", error.response?.data);
+            if (response.data.token && response.data.user) {
+                completeLogin(
+                    response.data.token,
+                    response.data.user
+                );
 
-      setError(
-        error.response?.data?.message ||
-          "Login failed. Please check your credentials."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+                if (response.data.user.role === "admin") {
+                    navigate("/admin", { replace: true });
+                } else {
+                    navigate(location.state?.from?.pathname || "/", {
+                        replace: true,
+                    });
+                }
 
-  return (
-    <div className="flex min-h-[calc(100vh-140px)] items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">Welcome Back</h1>
+                return;
+            }
 
-          <p className="mt-2 text-sm text-gray-500">
-            Login to your account to continue shopping.
-          </p>
-        </div>
+            navigate("/verify-login-otp", {
+                state: {
+                    email: response.data.email || formData.email,
+                    from: location.state?.from,
+                },
+            });
+        } catch (error) {
+            console.error("Login failed:", error);
+            console.log("Backend response:", error.response?.data);
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
-        >
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium"
-            >
-              Email
-            </label>
+            setError(
+                error.response?.data?.message ||
+                "Login failed. Please check your credentials."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-black"
-            />
-          </div>
+    return (
+        <div className="flex min-h-[calc(100vh-140px)] items-center justify-center px-6 py-12">
+            <div className="w-full max-w-md">
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold">
+                        Welcome Back
+                    </h1>
 
-          <div className="mb-3">
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium"
-            >
-              Password
-            </label>
+                    <p className="mt-2 text-sm text-gray-500">
+                        Login to your account to continue shopping.
+                    </p>
+                </div>
 
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-black"
-            />
-          </div>
+                <form
+                    onSubmit={handleSubmit}
+                    className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
+                >
+                    <div className="mb-5">
+                        <label
+                            htmlFor="email"
+                            className="mb-2 block text-sm font-medium"
+                        >
+                            Email
+                        </label>
 
-          <div className="mb-6 text-right">
-            <Link
-              to="/forgot-password"
-              className="text-xs font-medium text-gray-500 underline underline-offset-4 hover:text-black"
-            >
-              Forgot password?
-            </Link>
-          </div>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            required
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-black"
+                        />
+                    </div>
 
-          {error && (
-            <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-              {error}
+                    <div className="mb-3">
+                        <label
+                            htmlFor="password"
+                            className="mb-2 block text-sm font-medium"
+                        >
+                            Password
+                        </label>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter your password"
+                            required
+                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-black"
+                        />
+                    </div>
+
+                    <div className="mb-6 text-right">
+                        <Link
+                            to="/forgot-password"
+                            className="text-xs font-medium text-gray-500 underline underline-offset-4 hover:text-black"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+
+                    {error && (
+                        <div className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                            {error}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+
+                    <p className="mt-6 text-center text-sm text-gray-500">
+                        Don't have an account?{" "}
+                        <Link
+                            to="/register"
+                            className="font-semibold text-black underline underline-offset-4"
+                        >
+                            Create Account
+                        </Link>
+                    </p>
+                </form>
             </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? "Sending OTP..." : "Login"}
-          </button>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-semibold text-black underline underline-offset-4"
-            >
-              Create Account
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Login;

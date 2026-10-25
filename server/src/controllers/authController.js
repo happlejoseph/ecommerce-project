@@ -180,9 +180,7 @@ export const verifyOTP = async(req, res)=> {
 
 // LOGIN //
 export const loginUser = async (req, res) => {
-
     try {
-
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -209,12 +207,6 @@ export const loginUser = async (req, res) => {
             });
         }
 
-        if (!user.isEmailVerified) {
-            return res.status(403).json({
-                message: 'Please verify your email before logging in'
-            });
-        }
-
         const isPasswordMatch = await bcrypt.compare(
             password,
             user.password
@@ -222,22 +214,63 @@ export const loginUser = async (req, res) => {
 
         if (!isPasswordMatch) {
             return res.status(401).json({
-                message: 'Invalid password'
+                message: 'Invalid email or password'
+            });
+        }
+
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({
+                message: 'JWT secret is not configured'
+            });
+        }
+
+        if (user.role === 'admin') {
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    role: user.role
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: '6d'
+                }
+            );
+
+            return res.status(200).json({
+                message: 'Admin login successful',
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                message: 'Please verify your email before logging in'
             });
         }
 
         const otp = generateOTP();
 
         user.loginOTP = hashOTP(otp);
-        user.loginOTPExpiry = new Date(Date.now() + 5 * 60 * 1000);
+        user.loginOTPExpiry = new Date(
+            Date.now() + 5 * 60 * 1000
+        );
 
         await user.save();
 
         try {
-
             await sendOTPEmail(user.email, otp);
-        }
-        catch (emailError) {
+        } catch (emailError) {
+            console.error(
+                'Login OTP email error:',
+                emailError.message
+            );
+
             user.loginOTP = undefined;
             user.loginOTPExpiry = undefined;
 
@@ -253,15 +286,14 @@ export const loginUser = async (req, res) => {
             email: user.email
         });
 
-    }
-    
-    catch (error) {
+    } catch (error) {
+        console.error('Login error:', error.message);
+
         return res.status(500).json({
-            message: error.message
+            message: 'An error occurred during login'
         });
     }
 };
-
 
 
 
