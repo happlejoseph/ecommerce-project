@@ -24,6 +24,7 @@ const carModel = new mongoose.Schema({
             }
         }
     ]
+    
 }, {timestamps: true});
 
 const Cart = mongoose.model("Cart", carModel);
