@@ -84,6 +84,7 @@ export const registerUser = async(req, res)=> {
         }
         catch(error) {
             await User.findByIdAndDelete(user._id);
+            console.error('Register OTP email error:', error.message);
 
             return res.status(500).json({
                 message: 'Failed to send verification email. Please try again'
